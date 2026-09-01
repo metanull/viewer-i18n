@@ -82,6 +82,19 @@ A website merges its own `locales/<lang>.json` over that bundle, and the local
 value wins. That is the only merge rule in the system: a website may overload
 any entry it receives and add entries of its own, but it cannot delete one.
 
+It says which bundle it receives, and what its own entries are called, in its
+`package.json`:
+
+```json
+"viewerI18n": { "class": "gallery", "namespace": "carpets" }
+```
+
+`class` is one of `standalone`, `gallery`, `exhibition`. `namespace` is one
+lowercase word, no hyphens (`carpets`, `waterInIslam`) — it cannot be one of
+the shared section names, and it is the prefix the website's own entries carry.
+The checks below read this to know what a file may contain, so they refuse to
+run without it.
+
 `namespaces.json` is the registry: the sections that exist and what each bundle
 contains. `tools/build.mjs` produces the bundles; `tools/check.mjs` is the
 whole rulebook, and also ships with the package so websites enforce the same
