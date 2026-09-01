@@ -23,9 +23,22 @@ import { fileURLToPath } from 'node:url'
 export const KEY_RE = /^[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*$/
 // A language file is named after its language: en.json, fr.json, pt-BR.json.
 export const LANG_RE = /^[a-z]{2,3}(-[A-Za-z]{2,8})*$/
-// A tag, as opposed to the `<>` that appears inside prose about operators.
-const HTML_RE = /<\/?[A-Za-z][^>]*>/
 const BASE_LANGUAGE = 'en'
+
+// There is deliberately no rule here about HTML in a text. viewer-core's
+// Markdown pipeline escapes raw HTML rather than rendering it, so a tag a
+// translator types appears on the page as the characters they typed and can do
+// nothing else. Checking for it here bought no safety and cost accuracy: the
+// rule was a regular expression, and it rejected `<https://example.org/>`,
+// `<office@museumwnf.net>` and `` `<div>` `` — an autolink, an email autolink
+// and a code span, all ordinary Markdown — telling the translator to "write
+// formatting in Markdown instead", which is what they had done.
+//
+// Reading the Markdown grammar properly would have needed a parser, which
+// means a dependency, which means npm in every translator's pull request: real
+// cost, for a rule whose only remaining job was to prevent literal angle
+// brackets on a page. The escape is the guarantee. Keep it that way — if this
+// rule ever looks necessary again, check viewer-core's `renderBlock` first.
 
 const SOURCE_EXTENSIONS = ['.vue', '.js', '.mjs']
 // `t('key')`, `$t('key')` — never preceded by an identifier character, so
@@ -105,12 +118,6 @@ function checkEntries(label, data, namespaces, problems) {
       problems.push(
         `In **${label}**, the text for \`${key}\` is empty. Remove the whole line instead — ` +
           `an entry with no text hides the English one rather than falling back to it.`
-      )
-    }
-    if (HTML_RE.test(value)) {
-      problems.push(
-        `In **${label}**, the text for \`${key}\` contains HTML tags (text between < and >). ` +
-          `Write formatting in Markdown instead: **bold**, *italic*, [link](https://…).`
       )
     }
     if (/[{}]/.test(value)) {

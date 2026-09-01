@@ -98,16 +98,22 @@ describe('the dictionary', () => {
     assert.match(messagesOf(result), /is empty/)
   })
 
-  it('rejects HTML, and allows the < > that appears in prose', () => {
-    const withTag = checkDictionary(
-      dictionary({ 'core/en.json': { 'core.nav.home': '<b>Home</b>' } })
-    )
-    assert.match(messagesOf(withTag), /contains HTML tags/)
-
-    const withProse = checkDictionary(
-      dictionary({ 'core/en.json': { 'core.nav.home': 'The operators < and > rank results.' } })
-    )
-    assert.deepEqual(withProse.problems, [])
+  it('says nothing about angle brackets, whatever they turn out to be', () => {
+    // Not an oversight, and not a rule waiting to be written: viewer-core's
+    // Markdown pipeline escapes raw HTML, pinned by its own test "escapes raw
+    // HTML instead of rendering it". A tag typed here reaches the page as the
+    // characters that were typed. Judging which of these is a tag, an autolink
+    // or arithmetic is a job for a Markdown parser, and a parser here would put
+    // an npm install in front of every translator for no safety at all.
+    for (const text of [
+      '<b>Home</b>',
+      'The operators < and > rank results.',
+      'See <https://example.org/>.',
+      'Write to <office@museumwnf.net>.',
+    ]) {
+      const result = checkDictionary(dictionary({ 'core/en.json': { 'core.nav.home': text } }))
+      assert.deepEqual(result.problems, [], `${text} should be accepted`)
+    }
   })
 
   it('rejects a placeholder, because nothing is inserted into a text', () => {
