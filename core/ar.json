@@ -1,0 +1,9 @@
+{
+  "core.detail.notFound": "هذا السجل غير موجود.",
+  "core.list.empty": "لا يوجد ما يُعرض بعد.",
+  "core.nav.backToList": "العودة إلى القائمة",
+  "core.nav.home": "الرئيسية",
+  "core.pagination.next": "التالي",
+  "core.pagination.previous": "السابق",
+  "core.status.loading": "جارٍ التحميل…"
+}
