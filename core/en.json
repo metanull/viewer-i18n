@@ -1,0 +1,9 @@
+{
+  "core.detail.notFound": "This record does not exist.",
+  "core.list.empty": "Nothing to display yet.",
+  "core.nav.backToList": "Back to the list",
+  "core.nav.home": "Home",
+  "core.pagination.next": "Next",
+  "core.pagination.previous": "Previous",
+  "core.status.loading": "Loading…"
+}
