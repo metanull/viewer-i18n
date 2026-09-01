@@ -102,12 +102,21 @@ describe('the dictionary', () => {
     const withTag = checkDictionary(
       dictionary({ 'core/en.json': { 'core.nav.home': '<b>Home</b>' } })
     )
-    assert.match(messagesOf(withTag), /contains HTML tags/)
+    assert.match(messagesOf(withTag), /contains HTML/)
 
     const withProse = checkDictionary(
       dictionary({ 'core/en.json': { 'core.nav.home': 'The operators < and > rank results.' } })
     )
     assert.deepEqual(withProse.problems, [])
+  })
+
+  it('allows an autolink, which is Markdown and not HTML', () => {
+    // The rule used to reject this and tell the translator to write Markdown,
+    // which is what they had written. html.test.mjs holds the rest of the cases.
+    const result = checkDictionary(
+      dictionary({ 'core/en.json': { 'core.nav.home': 'See <https://example.org/>.' } })
+    )
+    assert.deepEqual(result.problems, [])
   })
 
   it('rejects a placeholder, because nothing is inserted into a text', () => {

@@ -18,14 +18,46 @@
 import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
+import { Marked } from 'marked'
 
 // namespace.section.label — camelCase segments, dots only as separators.
 export const KEY_RE = /^[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*$/
 // A language file is named after its language: en.json, fr.json, pt-BR.json.
 export const LANG_RE = /^[a-z]{2,3}(-[A-Za-z]{2,8})*$/
-// A tag, as opposed to the `<>` that appears inside prose about operators.
-const HTML_RE = /<\/?[A-Za-z][^>]*>/
 const BASE_LANGUAGE = 'en'
+
+// Whether a text contains HTML is a question about Markdown, so Markdown
+// answers it. The same library the websites render with, configured the same
+// way as viewer-core's pipeline, so what this accepts and what that renders
+// cannot drift apart.
+//
+// This replaced `/<\/?[A-Za-z][^>]*>/`, which was wrong about half of what it
+// was shown: `<https://example.org/>` and `<office@museumwnf.net>` are
+// autolinks, and `` `<div>` `` is a code span — all four are ordinary Markdown
+// and all four were rejected as HTML. A translator writing a bare URL was told
+// to "write formatting in Markdown instead", which is what they had done.
+const markdown = new Marked({ async: false, gfm: true, breaks: false })
+
+/** Every piece of raw HTML in a text, as the Markdown grammar sees it. */
+export function htmlIn(text) {
+  const found = []
+  const walk = (tokens) => {
+    for (const token of tokens ?? []) {
+      if (token.type === 'html') found.push(token.raw)
+      walk(token.tokens)
+      walk(token.items)
+    }
+  }
+  try {
+    walk(markdown.lexer(String(text)))
+  } catch {
+    // A text that will not even lex is a problem, but not this rule's problem:
+    // the empty and brace checks still run, and the renderer is what will
+    // complain about the rest.
+    return []
+  }
+  return found
+}
 
 const SOURCE_EXTENSIONS = ['.vue', '.js', '.mjs']
 // `t('key')`, `$t('key')` — never preceded by an identifier character, so
@@ -107,10 +139,14 @@ function checkEntries(label, data, namespaces, problems) {
           `an entry with no text hides the English one rather than falling back to it.`
       )
     }
-    if (HTML_RE.test(value)) {
+    const html = htmlIn(value)
+    if (html.length) {
       problems.push(
-        `In **${label}**, the text for \`${key}\` contains HTML tags (text between < and >). ` +
-          `Write formatting in Markdown instead: **bold**, *italic*, [link](https://…).`
+        `In **${label}**, the text for \`${key}\` contains HTML: ${html
+          .slice(0, 3)
+          .map((tag) => `\`${tag.trim()}\``)
+          .join(', ')}. Write formatting in Markdown instead: **bold**, *italic*, ` +
+          `[link](https://…). A plain web address needs no marks around it at all.`
       )
     }
     if (/[{}]/.test(value)) {
