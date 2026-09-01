@@ -1,0 +1,9 @@
+{
+  "core.detail.notFound": "Este registro no existe.",
+  "core.list.empty": "Todavía no hay nada que mostrar.",
+  "core.nav.backToList": "Volver a la lista",
+  "core.nav.home": "Inicio",
+  "core.pagination.next": "Siguiente",
+  "core.pagination.previous": "Anterior",
+  "core.status.loading": "Cargando…"
+}

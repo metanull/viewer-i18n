@@ -15,7 +15,7 @@
 // Messages are written for the person who has to fix them, who is usually a
 // translator and not a programmer.
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs'
+import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -430,7 +430,27 @@ export function main(argv, { writeReport } = {}) {
   return 1
 }
 
-if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+/**
+ * Whether this file is the program, as opposed to a module someone imported.
+ *
+ * Both sides are resolved through their symlinks, which is the whole point: npm
+ * installs a `bin` on Linux as a symlink in `node_modules/.bin`, so `argv[1]` is
+ * that link and not this file. Comparing the paths as written made the test
+ * false in exactly the place it mattered — `npx viewer-i18n-check` in CI ran,
+ * printed nothing, exited 0, and reported a green blocking check that had
+ * checked nothing. On Windows npm writes a shim that passes the real path
+ * instead, which is why it worked everywhere it was tried by hand.
+ */
+function invokedAsProgram() {
+  if (!process.argv[1]) return false
+  try {
+    return realpathSync(process.argv[1]) === realpathSync(fileURLToPath(import.meta.url))
+  } catch {
+    return false
+  }
+}
+
+if (invokedAsProgram()) {
   const { writeFileSync } = await import('node:fs')
   process.exit(
     main(process.argv.slice(2), {
