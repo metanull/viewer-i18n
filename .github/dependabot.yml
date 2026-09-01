@@ -1,0 +1,16 @@
+version: 2
+
+# There is no npm ecosystem here on purpose: this repository has no
+# dependencies at all. Its tools run on Node's own standard library, so that
+# the repository a translator opens contains text files and nothing to install.
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+    labels:
+      - dependencies
+    groups:
+      github-actions:
+        patterns:
+          - "*"

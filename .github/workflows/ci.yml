@@ -1,0 +1,25 @@
+name: CI
+
+on:
+  pull_request:
+
+# packages: read lets github.token install the private @metanull/*-data
+# packages the downstream websites depend on. A called workflow can only
+# downgrade the caller's token, so the grant has to be made here.
+#
+# contents/pull-requests: write are the translator flow's: the text check
+# explains itself on the pull request and merges a text-only change by itself.
+permissions:
+  contents: write
+  pull-requests: write
+  packages: read
+
+jobs:
+  ci:
+    uses: metanull/viewer-workflows/.github/workflows/package-ci.yml@v1.5.0
+
+  texts:
+    uses: metanull/viewer-workflows/.github/workflows/locale-validate.yml@v1.5.0
+    with:
+      mode: dictionary
+      texts_path: "core/ layout/ gallery/ exhibition/"

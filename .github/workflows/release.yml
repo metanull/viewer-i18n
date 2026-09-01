@@ -1,0 +1,13 @@
+name: Release
+
+on:
+  release:
+    types: [published]
+
+permissions:
+  contents: read
+  packages: write
+
+jobs:
+  publish:
+    uses: metanull/viewer-workflows/.github/workflows/package-release.yml@v1.5.0
