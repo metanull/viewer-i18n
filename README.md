@@ -41,10 +41,14 @@ A text is **just text**. It may be formatted with Markdown — `**bold**`,
 `*italic*`, `[a link](https://example.org)`, blank lines between paragraphs —
 and that is all.
 
-It may not contain HTML tags, and it may not contain `{` or `}`. Nothing is
-ever inserted into a text: a number, a date or a name is placed next to the
-text by the website, never inside it. This is why a text can be translated
-freely, without having to preserve anything.
+It may not contain `{` or `}`. Nothing is ever inserted into a text: a number,
+a date or a name is placed next to the text by the website, never inside it.
+This is why a text can be translated freely, without having to preserve
+anything.
+
+Writing an HTML tag is not forbidden, because it does not work: the websites
+escape HTML instead of rendering it, so `<b>Home</b>` appears on the page as
+those exact characters, angle brackets and all. Use Markdown.
 
 ## The sections
 

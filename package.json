@@ -26,9 +26,6 @@
   "bin": {
     "viewer-i18n-check": "tools/check.mjs"
   },
-  "dependencies": {
-    "marked": "^18.0.11"
-  },
   "scripts": {
     "build": "node tools/build.mjs",
     "check": "node tools/check.mjs --dictionary .",

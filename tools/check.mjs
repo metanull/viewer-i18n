@@ -18,7 +18,6 @@
 import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
 import { join, relative, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import { Marked } from 'marked'
 
 // namespace.section.label — camelCase segments, dots only as separators.
 export const KEY_RE = /^[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*$/
@@ -26,38 +25,20 @@ export const KEY_RE = /^[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*$
 export const LANG_RE = /^[a-z]{2,3}(-[A-Za-z]{2,8})*$/
 const BASE_LANGUAGE = 'en'
 
-// Whether a text contains HTML is a question about Markdown, so Markdown
-// answers it. The same library the websites render with, configured the same
-// way as viewer-core's pipeline, so what this accepts and what that renders
-// cannot drift apart.
+// There is deliberately no rule here about HTML in a text. viewer-core's
+// Markdown pipeline escapes raw HTML rather than rendering it, so a tag a
+// translator types appears on the page as the characters they typed and can do
+// nothing else. Checking for it here bought no safety and cost accuracy: the
+// rule was a regular expression, and it rejected `<https://example.org/>`,
+// `<office@museumwnf.net>` and `` `<div>` `` — an autolink, an email autolink
+// and a code span, all ordinary Markdown — telling the translator to "write
+// formatting in Markdown instead", which is what they had done.
 //
-// This replaced `/<\/?[A-Za-z][^>]*>/`, which was wrong about half of what it
-// was shown: `<https://example.org/>` and `<office@museumwnf.net>` are
-// autolinks, and `` `<div>` `` is a code span — all four are ordinary Markdown
-// and all four were rejected as HTML. A translator writing a bare URL was told
-// to "write formatting in Markdown instead", which is what they had done.
-const markdown = new Marked({ async: false, gfm: true, breaks: false })
-
-/** Every piece of raw HTML in a text, as the Markdown grammar sees it. */
-export function htmlIn(text) {
-  const found = []
-  const walk = (tokens) => {
-    for (const token of tokens ?? []) {
-      if (token.type === 'html') found.push(token.raw)
-      walk(token.tokens)
-      walk(token.items)
-    }
-  }
-  try {
-    walk(markdown.lexer(String(text)))
-  } catch {
-    // A text that will not even lex is a problem, but not this rule's problem:
-    // the empty and brace checks still run, and the renderer is what will
-    // complain about the rest.
-    return []
-  }
-  return found
-}
+// Reading the Markdown grammar properly would have needed a parser, which
+// means a dependency, which means npm in every translator's pull request: real
+// cost, for a rule whose only remaining job was to prevent literal angle
+// brackets on a page. The escape is the guarantee. Keep it that way — if this
+// rule ever looks necessary again, check viewer-core's `renderBlock` first.
 
 const SOURCE_EXTENSIONS = ['.vue', '.js', '.mjs']
 // `t('key')`, `$t('key')` — never preceded by an identifier character, so
@@ -137,16 +118,6 @@ function checkEntries(label, data, namespaces, problems) {
       problems.push(
         `In **${label}**, the text for \`${key}\` is empty. Remove the whole line instead — ` +
           `an entry with no text hides the English one rather than falling back to it.`
-      )
-    }
-    const html = htmlIn(value)
-    if (html.length) {
-      problems.push(
-        `In **${label}**, the text for \`${key}\` contains HTML: ${html
-          .slice(0, 3)
-          .map((tag) => `\`${tag.trim()}\``)
-          .join(', ')}. Write formatting in Markdown instead: **bold**, *italic*, ` +
-          `[link](https://…). A plain web address needs no marks around it at all.`
       )
     }
     if (/[{}]/.test(value)) {
