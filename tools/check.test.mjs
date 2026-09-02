@@ -211,13 +211,17 @@ describe('a website', () => {
 })
 
 describe('the call sites', () => {
-  it('finds every way a text is asked for, and ignores lookalikes', () => {
+  /** A component whose `t` is the one that looks a text up. */
+  const withI18n = (body) =>
+    `<script setup>import { useI18n } from '@metanull/viewer-core'\nconst { t } = useI18n()\n${body}</script>`
+
+  it('finds every way a text is asked for, and ignores lookalikes', async () => {
     const dir = scratch({
       'src/A.vue': `<template><p>{{ $t('core.nav.home') }}</p>
         <I18nText keypath="gallery.about.body" /></template>
-        <script setup>const x = t('gallery.sheet.name'); const y = list.split(',')</script>`,
+        ${withI18n("const x = t('gallery.sheet.name'); const y = list.split(',')")}`,
     })
-    const { references, dynamic } = scanSources(dir)
+    const { references, dynamic } = await scanSources(dir)
     assert.deepEqual(
       [...references.keys()].sort(),
       ['core.nav.home', 'gallery.about.body', 'gallery.sheet.name']
@@ -225,29 +229,81 @@ describe('the call sites', () => {
     assert.deepEqual(dynamic, [])
   })
 
-  it('reports a text asked for with a value rather than a name', () => {
-    const dir = scratch({ 'src/A.vue': '<script setup>const label = t(key)</script>' })
-    assert.equal(scanSources(dir).dynamic.length, 1)
+  it('reads a bound keypath as well as a written one', async () => {
+    const dir = scratch({
+      'src/A.vue': `<template><I18nText :keypath="'gallery.about.body'" /></template>`,
+    })
+    assert.deepEqual([...(await scanSources(dir)).references.keys()], ['gallery.about.body'])
   })
 
-  it('rejects a name the website cannot resolve', () => {
+  it('reports a text asked for with a value rather than a name', async () => {
+    const dir = scratch({ 'src/A.vue': withI18n('const label = t(key)') })
+    assert.equal((await scanSources(dir)).dynamic.length, 1)
+  })
+
+  it('does not read a component\'s own t() as a text being asked for', async () => {
+    // This is why the rule is parsed rather than matched. `t` here is a local
+    // helper — a real component had one, and the regular expression reported
+    // every call to it as a text asked for by value.
+    const dir = scratch({
+      'src/A.vue': "<script setup>const t = (item) => item.title ?? item.name\nconst a = t(first)</script>",
+    })
+    const { references, dynamic } = await scanSources(dir)
+    assert.deepEqual([...references.keys()], [])
+    assert.deepEqual(dynamic, [])
+  })
+
+  it('follows the lookup into a function it is handed to', async () => {
+    // `water-in-islam/src/composables/useCollection.js` uses the name both
+    // ways in one file: the lookup arrives as a parameter here, and thirty
+    // lines further down `const t = tr('items', …)` is a translated record.
+    // Reading the file as text has to guess, and guessing either way costs
+    // nine references.
+    const dir = scratch({
+      'src/facets.js': [
+        "export function facetLabels(t) {",
+        "  return { type: t('exhibition.facet.type') }",
+        '}',
+        'function labelOf(item, defaultLang) {',
+        "  const t = tr('items', item.id, defaultLang)",
+        '  return t(item)',
+        '}',
+      ].join('\n'),
+    })
+    const { references, dynamic } = await scanSources(dir)
+    assert.deepEqual([...references.keys()], ['exhibition.facet.type'])
+    assert.deepEqual(dynamic, [])
+  })
+
+  it('does not read a name written in a comment as a call', async () => {
+    // Also from the rollout: a comment explaining the rule tripped the rule.
+    const dir = scratch({
+      'src/A.vue': withI18n("// passing the item to t(item) would read as a lookup\nconst a = 1"),
+    })
+    const { references, dynamic } = await scanSources(dir)
+    assert.deepEqual([...references.keys()], [])
+    assert.deepEqual(dynamic, [])
+  })
+
+  it('rejects a name the website cannot resolve', async () => {
     const dir = scratch({
       'package.json': { name: 'carpets', viewerI18n: { class: 'gallery', namespace: 'carpets' } },
       'locales/en.json': {},
-      'src/A.vue': "<script setup>const a = t('gallery.sheet.missing')</script>",
+      'src/A.vue': withI18n("const a = t('gallery.sheet.missing')"),
       'node_modules/@metanull/viewer-i18n/dist/gallery/en.json': { 'gallery.sheet.name': 'Name:' },
     })
-    assert.match(messagesOf(checkApp(dir)), /does not exist/)
+    assert.match(messagesOf(await checkApp(dir)), /does not exist/)
   })
 
-  it('accepts a name that comes from the shared texts', () => {
+  it('accepts a name that comes from the shared texts', async () => {
     const dir = scratch({
       'package.json': { name: 'carpets', viewerI18n: { class: 'gallery', namespace: 'carpets' } },
       'locales/en.json': { 'carpets.identity.title': 'Discover Carpet Art' },
-      'src/A.vue':
-        "<script setup>const a = t('gallery.sheet.name'); const b = t('carpets.identity.title')</script>",
+      'src/A.vue': withI18n(
+        "const a = t('gallery.sheet.name'); const b = t('carpets.identity.title')"
+      ),
       'node_modules/@metanull/viewer-i18n/dist/gallery/en.json': { 'gallery.sheet.name': 'Name:' },
     })
-    assert.deepEqual(checkApp(dir).problems, [])
+    assert.deepEqual((await checkApp(dir)).problems, [])
   })
 })
