@@ -40,3 +40,16 @@
   the translator to write Markdown instead, which is what they had done.
 - The checker has no dependencies again, so a translator's pull request still
   runs no npm install.
+
+## 1.4.0
+
+- A language file's name is now read by `Intl` rather than matched against a
+  regular expression. The platform knows BCP 47, so nothing here re-describes
+  it: `Intl.getCanonicalLocales` parses the tag and rejects what is not one.
+- One spelling per language. `pt-br.json` is now reported and told to be
+  `pt-BR.json`, so two files cannot both claim a language and leave the
+  filesystem to decide which one a reader gets.
+- The length rule stays ours: an ISO 639 code is two or three letters, and
+  BCP 47's grammar happily accepts `common` and `index` as languages.
+- `LANG_RE` is replaced by `languageOf(name)`, which returns the canonical
+  spelling or null.
