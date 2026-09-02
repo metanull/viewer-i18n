@@ -9,7 +9,7 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { after, describe, it } from 'node:test'
 
-import { KEY_RE, checkApp, checkDictionary, checkSite, scanSources } from './check.mjs'
+import { KEY_RE, checkApp, checkDictionary, checkSite, languageOf, scanSources } from './check.mjs'
 
 const repo = dirname(dirname(fileURLToPath(import.meta.url)))
 const temporary = []
@@ -58,6 +58,31 @@ describe('the entry-name grammar', () => {
     for (const key of ['gallery.name', 'a.b.c.d', 'Gallery.sheet.name', 'gallery..name', '']) {
       assert.ok(!KEY_RE.test(key), `${key} should be rejected`)
     }
+  })
+})
+
+describe('the name of a language file', () => {
+  it('accepts a language, and says how it is spelled', () => {
+    assert.equal(languageOf('en'), 'en')
+    assert.equal(languageOf('pt-BR'), 'pt-BR')
+    // One spelling per language, so two files cannot both claim it and leave
+    // the filesystem to decide which one a reader gets.
+    assert.equal(languageOf('pt-br'), 'pt-BR')
+    assert.equal(languageOf('EN'), 'en')
+  })
+
+  it('rejects what is not a language tag', () => {
+    for (const name of ['e', 'zz9', 'en_US', '']) {
+      assert.equal(languageOf(name), null, `${name} should be rejected`)
+    }
+  })
+
+  it('rejects a word that BCP 47 would accept as a language', () => {
+    // `Intl` reads both of these as valid tags — the grammar allows a five to
+    // eight letter primary subtag, though none are assigned. This is the only
+    // part of the rule that is ours rather than the standard's.
+    assert.equal(languageOf('common'), null)
+    assert.equal(languageOf('index'), null)
   })
 })
 

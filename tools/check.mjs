@@ -22,7 +22,24 @@ import { fileURLToPath } from 'node:url'
 // namespace.section.label — camelCase segments, dots only as separators.
 export const KEY_RE = /^[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*$/
 // A language file is named after its language: en.json, fr.json, pt-BR.json.
-export const LANG_RE = /^[a-z]{2,3}(-[A-Za-z]{2,8})*$/
+// What a language tag may look like is BCP 47's business and the platform
+// already knows it, so nothing here re-describes the grammar: `Intl` parses the
+// tag, canonicalises its spelling and rejects what is not one.
+//
+// The one rule that is ours is the length. An ISO 639 code is two or three
+// letters; BCP 47 also allows five to eight, none of which are assigned, so
+// without this `common.json` and `index.json` both read as valid languages.
+/** The language a file is named after, canonically spelled, or null. */
+export function languageOf(name) {
+  let canonical
+  try {
+    ;[canonical] = Intl.getCanonicalLocales(name)
+  } catch {
+    return null
+  }
+  if (!canonical) return null
+  return new Intl.Locale(canonical).language.length > 3 ? null : canonical
+}
 const BASE_LANGUAGE = 'en'
 
 // There is deliberately no rule here about HTML in a text. viewer-core's
@@ -219,10 +236,19 @@ export function checkDictionary(dir) {
     for (const file of files) {
       const language = file.slice(0, -'.json'.length)
       const label = `${namespace}/${file}`
-      if (!LANG_RE.test(language)) {
+      const canonical = languageOf(language)
+      if (canonical === null) {
         problems.push(
           `**${label}** is not named after a language. Use the two-letter code, ` +
             'for example `fr.json`.'
+        )
+        continue
+      }
+      if (canonical !== language) {
+        problems.push(
+          `**${label}** should be named \`${canonical}.json\`. A language is spelled one ` +
+            'way, so that two files cannot both claim it with only the filesystem ' +
+            'deciding which one a reader gets.'
         )
         continue
       }
@@ -278,10 +304,19 @@ export function checkSite(dir) {
   for (const file of languageFiles(localesDir)) {
     const language = file.slice(0, -'.json'.length)
     const label = `locales/${file}`
-    if (!LANG_RE.test(language)) {
+    const canonical = languageOf(language)
+    if (canonical === null) {
       problems.push(
         `**${label}** is not named after a language. Use the two-letter code, ` +
           'for example `fr.json`.'
+      )
+      continue
+    }
+    if (canonical !== language) {
+      problems.push(
+        `**${label}** should be named \`${canonical}.json\`. A language is spelled one ` +
+          'way, so that two files cannot both claim it with only the filesystem ' +
+          'deciding which one a reader gets.'
       )
       continue
     }
