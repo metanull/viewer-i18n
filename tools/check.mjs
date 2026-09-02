@@ -16,8 +16,9 @@
 // translator and not a programmer.
 
 import { existsSync, readdirSync, readFileSync, realpathSync, statSync } from 'node:fs'
+import { createRequire } from 'node:module'
 import { join, relative, resolve } from 'node:path'
-import { fileURLToPath } from 'node:url'
+import { fileURLToPath, pathToFileURL } from 'node:url'
 
 // namespace.section.label — camelCase segments, dots only as separators.
 export const KEY_RE = /^[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*\.[a-z][a-zA-Z0-9]*$/
@@ -58,10 +59,147 @@ const BASE_LANGUAGE = 'en'
 // rule ever looks necessary again, check viewer-core's `renderBlock` first.
 
 const SOURCE_EXTENSIONS = ['.vue', '.js', '.mjs']
-// `t('key')`, `$t('key')` — never preceded by an identifier character, so
-// `split(`, `format(` and friends do not match.
-const CALL_RE = /(?<![\w$.])\$?t\(\s*(?:(['"])([^'"]*)\1)?/g
-const KEYPATH_RE = /\bkeypath\s*=\s*"(?:'([^']*)'|([^"]*))"/g
+
+// How a text is asked for is a question about code, so the code is parsed.
+// `@vue/compiler-sfc` is the parser the website already builds with — vite
+// hands it every one of these files — so this reads them the way the bundler
+// does, and needs nothing installed that was not there already. It is resolved
+// from the website being checked rather than declared here, which is also what
+// keeps `--site` free of it: only this mode ever loads a parser.
+//
+// It replaced two regular expressions that were wrong in both directions.
+// `t(item)` written inside a prose comment was read as a text being asked for,
+// and a component's own `const t = (item) => …` could not be told apart from
+// the one that looks a text up — both cost real edits during the rollout.
+async function loadCompiler(dir) {
+  // The website's own copy first, so the code is read by the version that
+  // builds it. Ours second, which is what lets these rules be tested here.
+  for (const from of [join(dir, 'package.json'), fileURLToPath(import.meta.url)]) {
+    try {
+      return await import(pathToFileURL(createRequire(from).resolve('@vue/compiler-sfc')).href)
+    } catch {
+      continue
+    }
+  }
+  return null
+}
+
+/** The name a call is made under: `t`, `$t`, `_ctx.$t` — all read as the last part. */
+function calleeName(callee) {
+  if (callee?.type === 'Identifier') return callee.name
+  if (callee?.type === 'MemberExpression' && callee.property?.type === 'Identifier') {
+    return callee.property.name
+  }
+  return null
+}
+
+const FUNCTIONS = new Set([
+  'FunctionDeclaration',
+  'FunctionExpression',
+  'ArrowFunctionExpression',
+  'ObjectMethod',
+  'ClassMethod',
+])
+
+/** Whether a `t` bound by this block is the one that looks a text up — null if it binds none. */
+function tBoundIn(block) {
+  let verdict = null
+  for (const statement of block.body ?? []) {
+    if (statement.type === 'FunctionDeclaration' && statement.id?.name === 't') verdict = false
+    if (statement.type !== 'VariableDeclaration') continue
+    for (const declarator of statement.declarations) {
+      const id = declarator.id
+      const binds =
+        (id?.type === 'Identifier' && id.name === 't') ||
+        (id?.type === 'ObjectPattern' &&
+          id.properties.some((p) => p.value?.name === 't' || p.key?.name === 't'))
+      if (!binds) continue
+      verdict =
+        declarator.init?.type === 'CallExpression' &&
+        calleeName(declarator.init.callee) === 'useI18n'
+    }
+  }
+  return verdict
+}
+
+/**
+ * Every node, carrying what `t` means where it stands.
+ *
+ * Which is the whole reason this is parsed rather than matched. One real file,
+ * `water-in-islam/src/composables/useCollection.js`, uses the name both ways:
+ * `export function facetLabels(t)` receives the text lookup as a parameter,
+ * while `const t = tr('items', item.id, defaultLang)` further down is a
+ * translated record. A rule that reads the file as text has to guess, and
+ * either invents nine references or loses them.
+ */
+function eachNode(node, scope, visit) {
+  if (Array.isArray(node)) {
+    for (const item of node) eachNode(item, scope, visit)
+    return
+  }
+  if (!node || typeof node !== 'object' || typeof node.type !== 'string') return
+
+  // A `t` handed to a function is the lookup being passed down; a block that
+  // declares its own says for itself which it is.
+  if (FUNCTIONS.has(node.type) && node.params?.some((p) => p.type === 'Identifier' && p.name === 't')) {
+    scope = true
+  }
+  if (node.type === 'Program' || node.type === 'BlockStatement') {
+    const own = tBoundIn(node)
+    if (own !== null) scope = own
+  }
+
+  visit(node, scope)
+  for (const [key, value] of Object.entries(node)) {
+    if (key === 'loc' || key.endsWith('Comments')) continue
+    eachNode(value, scope, visit)
+  }
+}
+
+/**
+ * Collect the names asked for in one piece of JavaScript.
+ *
+ * `line` offsets a block back onto the file it came from; a template is
+ * compiled before it is read, so its lines are the compiled ones and it
+ * reports the file instead.
+ */
+function collectFromScript(compiler, code, where, { line = 0, detectT = true, i18nT = false, found }) {
+  let ast
+  try {
+    ast = compiler.babelParse(code, { sourceType: 'module', errorRecovery: true })
+  } catch (error) {
+    found.unreadable.push(`${where}: ${error.message}`)
+    return false
+  }
+  const at = (node) => (line === null ? where : `${where}:${(node.loc?.start.line ?? 1) + line}`)
+  const record = (key, node) => {
+    if (!found.references.has(key)) found.references.set(key, at(node))
+  }
+
+  // A script says for itself what `t` is at its top level; a compiled template
+  // has no declarations of its own and inherits the script's answer.
+  eachNode(ast.program, detectT ? false : i18nT, (node, tIsLookup) => {
+    if (
+      node.type === 'ObjectProperty' &&
+      (node.key?.name === 'keypath' || node.key?.value === 'keypath')
+    ) {
+      if (node.value?.type === 'StringLiteral') record(node.value.value, node)
+      else found.dynamic.push(at(node))
+      return
+    }
+    if (node.type !== 'CallExpression') return
+    const name = calleeName(node.callee)
+    if (name !== 't' && name !== '$t') return
+    // A bare `t` counts only where `t` is the lookup. `$t` is the global one,
+    // so it counts wherever it appears.
+    if (name === 't' && !tIsLookup) return
+    const [first] = node.arguments
+    if (first?.type === 'StringLiteral') record(first.value, node)
+    else found.dynamic.push(at(node))
+  })
+
+  return tBoundIn(ast.program) === true
+}
 
 // ── helpers ────────────────────────────────────────────────────────────────
 
@@ -360,28 +498,55 @@ function sourceFiles(dir) {
 }
 
 /** Every key the code asks for, and every place it asks with something else. */
-export function scanSources(dir) {
-  const references = new Map()
-  const dynamic = []
+export async function scanSources(dir, compiler) {
+  const found = { references: new Map(), dynamic: [], unreadable: [] }
+  const parser = compiler ?? (await loadCompiler(dir))
+  if (!parser) {
+    found.unreadable.push('no parser')
+    return found
+  }
+
   for (const file of sourceFiles(join(dir, 'src'))) {
     const text = readFileSync(file, 'utf8')
     const where = relative(dir, file).replaceAll('\\', '/')
-    const lineOf = (index) => text.slice(0, index).split('\n').length
 
-    for (const match of text.matchAll(CALL_RE)) {
-      const key = match[2]
-      if (key === undefined) dynamic.push(`${where}:${lineOf(match.index)}`)
-      else if (!references.has(key)) references.set(key, `${where}:${lineOf(match.index)}`)
+    if (!file.endsWith('.vue')) {
+      collectFromScript(parser, text, where, { found })
+      continue
     }
-    for (const match of text.matchAll(KEYPATH_RE)) {
-      const key = match[1] ?? match[2]
-      if (!references.has(key)) references.set(key, `${where}:${lineOf(match.index)}`)
+
+    const { descriptor, errors } = parser.parse(text, { filename: where })
+    if (errors.length) {
+      found.unreadable.push(`${where}: ${errors[0].message}`)
+      continue
     }
+
+    // The script first: whether the template's `t` is the i18n one is decided
+    // by what the script bound it to.
+    let i18nT = false
+    for (const block of [descriptor.script, descriptor.scriptSetup]) {
+      if (!block) continue
+      const line = (block.loc?.start.line ?? 1) - 1
+      i18nT = collectFromScript(parser, block.content, where, { line, found }) || i18nT
+    }
+
+    if (!descriptor.template) continue
+    const compiled = parser.compileTemplate({
+      source: descriptor.template.content,
+      filename: where,
+      id: where,
+    })
+    if (compiled.errors.length) {
+      found.unreadable.push(`${where}: ${compiled.errors[0].message ?? compiled.errors[0]}`)
+      continue
+    }
+    collectFromScript(parser, compiled.code, where, { line: null, detectT: false, i18nT, found })
   }
-  return { references, dynamic }
+
+  return found
 }
 
-export function checkApp(dir) {
+export async function checkApp(dir) {
   const problems = []
   const notes = []
   const registry = loadRegistry(dir)
@@ -404,7 +569,20 @@ export function checkApp(dir) {
   if (!shared || !local) return { problems, notes }
   const effective = { ...shared, ...local }
 
-  const { references, dynamic } = scanSources(dir)
+  const { references, dynamic, unreadable } = await scanSources(dir)
+  if (unreadable.includes('no parser')) {
+    problems.push(
+      'The website\'s own Vue compiler could not be found, so its code cannot be read. ' +
+        'Run `npm install` first — this check reads the sources with the same parser the ' +
+        'website builds with, and takes it from this directory.'
+    )
+    return { problems, notes }
+  }
+  for (const where of unreadable) {
+    problems.push(
+      `The file ${where} could not be parsed, so the texts it asks for cannot be checked.`
+    )
+  }
   for (const where of dynamic) {
     problems.push(
       `At ${where}, a text is asked for with something other than a written-out name. ` +
@@ -452,14 +630,14 @@ export function report(problems) {
   ].join('\n')
 }
 
-export function main(argv, { writeReport } = {}) {
+export async function main(argv, { writeReport } = {}) {
   const mode = argv.find((arg) => arg in MODES)
   if (!mode) {
     console.error('Usage: viewer-i18n-check --dictionary|--site|--app [directory]')
     return 2
   }
   const dir = resolve(argv[argv.indexOf(mode) + 1] ?? '.')
-  const { problems, notes } = MODES[mode](dir)
+  const { problems, notes } = await MODES[mode](dir)
 
   for (const note of notes) console.log(`  ${note}`)
   if (!problems.length) {
@@ -495,7 +673,7 @@ function invokedAsProgram() {
 if (invokedAsProgram()) {
   const { writeFileSync } = await import('node:fs')
   process.exit(
-    main(process.argv.slice(2), {
+    await main(process.argv.slice(2), {
       writeReport: (body) => writeFileSync('locale-problems.md', body),
     })
   )

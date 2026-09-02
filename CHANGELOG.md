@@ -53,3 +53,21 @@
   BCP 47's grammar happily accepts `common` and `index` as languages.
 - `LANG_RE` is replaced by `languageOf(name)`, which returns the canonical
   spelling or null.
+
+## 1.5.0
+
+- The call sites are parsed, not matched. `@vue/compiler-sfc` — the parser the
+  website already builds with — reads the scripts and the compiled template,
+  and the names asked for are taken from the syntax tree.
+- Two regular expressions are gone, and with them two ways of being wrong:
+  `t(item)` written inside a prose comment was read as a text being asked for,
+  and a component's own `const t = (item) => …` could not be told apart from
+  the one that looks a text up. Both cost real edits during the rollout.
+- `t` is now followed properly through scope, because one file uses the name
+  both ways: `export function facetLabels(t)` receives the lookup as a
+  parameter, while `const t = tr('items', …)` below it is a translated record.
+- Verified against all seven websites: the same entries are found as before,
+  with the false positives gone.
+- The parser is resolved from the website being checked, so `--site` — the mode
+  a translator's pull request runs — still loads nothing and installs nothing.
+- `scanSources`, `checkApp` and `main` are async.
