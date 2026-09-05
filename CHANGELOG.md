@@ -71,3 +71,11 @@
 - The parser is resolved from the website being checked, so `--site` — the mode
   a translator's pull request runs — still loads nothing and installs nothing.
 - `scanSources`, `checkApp` and `main` are async.
+
+## 1.6.0
+
+- `core.notFound.page`, read by viewer-core 1.6.0's `NotFoundView` — the
+  page every website's catch-all lands on, now that the router owns it.
+- `layout.nav.menu`, the label of the hamburger button viewer-layout 2.1.0's
+  navigation shows on a narrow screen, so no website keeps a menu of its own.
+- Both in English, French, Spanish and Arabic.
