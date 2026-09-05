@@ -2,6 +2,7 @@
   "layout.hyperlinks.label": "Liens connexes",
   "layout.language.label": "Langue",
   "layout.nav.label": "Navigation principale",
+  "layout.nav.menu": "Menu",
   "layout.nav.skipToContent": "Aller au contenu",
   "layout.sponsors.label": "Partenaires"
 }

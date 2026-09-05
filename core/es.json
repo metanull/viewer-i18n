@@ -3,6 +3,7 @@
   "core.list.empty": "Todavía no hay nada que mostrar.",
   "core.nav.backToList": "Volver a la lista",
   "core.nav.home": "Inicio",
+  "core.notFound.page": "Esta página no existe.",
   "core.pagination.next": "Siguiente",
   "core.pagination.previous": "Anterior",
   "core.status.loading": "Cargando…"
