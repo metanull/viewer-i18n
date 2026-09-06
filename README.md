@@ -62,11 +62,7 @@ those exact characters, angle brackets and all. Use Markdown.
 | `record/` | what surrounds the sheet: back, timeline, related items, credits, citation, the glossary |
 | `exhibition/` | the exhibitions (Water in Islam, The Use of Colours in Art, …) |
 
-`gallery/` and `exhibition/` stay separate even where they say the same thing.
-A change to a gallery text must never reach an exhibition by surprise, and that
-is worth repeating a label for. `catalogue/`, `sheet/` and `record/` are the
-opposite case: one label for the same thing on every website, so that the
-seven websites read one sheet vocabulary rather than seven.
+`gallery/` and `exhibition/` hold only what a gallery or an exhibition says and no other kind of website does — the sections, the navigation, the partner page, the timeline pages, the notices, the themes. What every website says the same way lives once, in `catalogue/`, `sheet/` and `record/`, so that the seven websites read one vocabulary rather than seven; since 2.0.0 the two family sections carry no copy of it.
 
 Entry names are written as `section.group.name` — three parts, so
 `gallery.sheet.inventoryNumber` reads as "in the galleries, on the item sheet,

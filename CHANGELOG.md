@@ -1,5 +1,35 @@
 # Changelog
 
+## 2.0.0
+
+Wave E of the shared-pages epic (metanull/inventory-app#1691), the last
+step (#13): the `gallery` and `exhibition` entries that `catalogue`,
+`sheet`, `record` and `core` replaced in 1.7.0 are removed. **Breaking**
+for any website still asking for one — it would render as its own name.
+Every website's `main` was moved onto the shared entries before this
+release (the seven wave D adoptions, then metanull/carpets#26,
+metanull/amulets#24, metanull/water-in-islam#26 and
+metanull/the-use-of-colours-in-art#24 for the last handful), and this
+release's downstream check built and tested all seven against it.
+
+The rule: an entry goes when a shared one says the same thing — the era
+words, the facet labels, the filter words, the glossary heading and
+instructions, what surrounds the sheet (add to collection, citation,
+download, on display in, photograph, source database, timeline for this
+item), the pagination words, the project names, the results words, the
+search form's button and "how to search", every sheet label, back, go,
+reset, close, menu, "Exhibition(s)". What only a gallery or an
+exhibition says stays: the sections, the navigation, the partner page,
+the timeline pages, the notices, the about and intro texts, the
+sponsors, the themes.
+
+`tools/prune-duplicates.mjs` is the list, applied; it stays in the
+repository so the rule is readable.
+
+- **`gallery/`** loses 87 entries: `gallery.action.back`, `gallery.action.go`, `gallery.action.resetFilters`, `gallery.era.ad`, `gallery.era.after`, `gallery.era.bc`, `gallery.era.before`, `gallery.facet.any`, `gallery.facet.artist`, `gallery.facet.country`, `gallery.facet.endDate`, `gallery.facet.filterBy`, `gallery.facet.filterFurtherBy`, `gallery.facet.material`, `gallery.facet.periodDynasty`, `gallery.facet.selectCountry`, `gallery.facet.startDate`, `gallery.facet.subject`, `gallery.facet.type`, `gallery.filter.from`, `gallery.filter.to`, `gallery.glossary.definition`, `gallery.glossary.instructions`, `gallery.item.addToCollection`, `gallery.item.citation`, `gallery.item.download`, `gallery.item.downloadPdf`, `gallery.item.in`, `gallery.item.onDisplayIn`, `gallery.item.photograph`, `gallery.item.sourceDatabase`, `gallery.item.timeline`, `gallery.nav.exhibitions`, `gallery.nav.glossary`, `gallery.nav.menu`, `gallery.pagination.first`, `gallery.pagination.last`, `gallery.pagination.page`, `gallery.project.baroqueArt`, `gallery.project.carpetArt`, `gallery.project.explorePartners`, `gallery.project.glassArt`, `gallery.project.islamicArt`, `gallery.project.sharingHistory`, `gallery.project.tableIsSet`, `gallery.related.audioVideos`, `gallery.results.allObjects`, `gallery.results.forProject`, `gallery.results.heading`, `gallery.results.noResults`, `gallery.results.objects`, `gallery.results.outOf`, `gallery.results.timelineForSearch`, `gallery.search.howTo`, `gallery.search.howToLink`, `gallery.search.submit`, `gallery.sheet.alsoKnownAs`, `gallery.sheet.artists`, `gallery.sheet.bibliography`, `gallery.sheet.binding`, `gallery.sheet.catalogueLink`, `gallery.sheet.copyeditedBy`, `gallery.sheet.copyrightInformation`, `gallery.sheet.currentOwner`, `gallery.sheet.datationMethod`, `gallery.sheet.date`, `gallery.sheet.description`, `gallery.sheet.dimensions`, `gallery.sheet.holdingMuseum`, `gallery.sheet.inventoryNumber`, `gallery.sheet.location`, `gallery.sheet.materials`, `gallery.sheet.name`, `gallery.sheet.obtentionMethod`, `gallery.sheet.originalOwner`, `gallery.sheet.periodDynasty`, `gallery.sheet.placeOfProduction`, `gallery.sheet.preparedBy`, `gallery.sheet.provenance`, `gallery.sheet.provenanceMethod`, `gallery.sheet.scribe`, `gallery.sheet.shortDescription`, `gallery.sheet.translationBy`, `gallery.sheet.translationCopyeditedBy`, `gallery.sheet.type`, `gallery.sheet.workingNumber`, `gallery.sheet.workshop`.
+- **`exhibition/`** loses 88 entries: `exhibition.action.back`, `exhibition.action.go`, `exhibition.action.resetFilters`, `exhibition.era.ad`, `exhibition.era.after`, `exhibition.era.bc`, `exhibition.era.before`, `exhibition.facet.any`, `exhibition.facet.artist`, `exhibition.facet.country`, `exhibition.facet.endDate`, `exhibition.facet.filterBy`, `exhibition.facet.filterFurtherBy`, `exhibition.facet.material`, `exhibition.facet.periodDynasty`, `exhibition.facet.selectCountry`, `exhibition.facet.startDate`, `exhibition.facet.subject`, `exhibition.facet.type`, `exhibition.filter.from`, `exhibition.filter.to`, `exhibition.glossary.definition`, `exhibition.glossary.instructions`, `exhibition.item.addToCollection`, `exhibition.item.citation`, `exhibition.item.download`, `exhibition.item.downloadPdf`, `exhibition.item.in`, `exhibition.item.onDisplayIn`, `exhibition.item.photograph`, `exhibition.item.sourceDatabase`, `exhibition.item.timeline`, `exhibition.nav.exhibitions`, `exhibition.nav.glossary`, `exhibition.nav.menu`, `exhibition.pagination.first`, `exhibition.pagination.last`, `exhibition.pagination.page`, `exhibition.project.baroqueArt`, `exhibition.project.carpetArt`, `exhibition.project.explorePartners`, `exhibition.project.glassArt`, `exhibition.project.islamicArt`, `exhibition.project.sharingHistory`, `exhibition.project.tableIsSet`, `exhibition.related.audioVideos`, `exhibition.results.allObjects`, `exhibition.results.forProject`, `exhibition.results.heading`, `exhibition.results.noResults`, `exhibition.results.objects`, `exhibition.results.outOf`, `exhibition.results.timelineForSearch`, `exhibition.search.howTo`, `exhibition.search.howToLink`, `exhibition.search.submit`, `exhibition.sheet.alsoKnownAs`, `exhibition.sheet.artists`, `exhibition.sheet.bibliography`, `exhibition.sheet.binding`, `exhibition.sheet.catalogueLink`, `exhibition.sheet.copyeditedBy`, `exhibition.sheet.copyrightInformation`, `exhibition.sheet.currentOwner`, `exhibition.sheet.datationMethod`, `exhibition.sheet.date`, `exhibition.sheet.description`, `exhibition.sheet.dimensions`, `exhibition.sheet.holdingMuseum`, `exhibition.sheet.inventoryNumber`, `exhibition.sheet.location`, `exhibition.sheet.materials`, `exhibition.sheet.name`, `exhibition.sheet.obtentionMethod`, `exhibition.sheet.originalOwner`, `exhibition.sheet.periodDynasty`, `exhibition.sheet.placeOfProduction`, `exhibition.sheet.preparedBy`, `exhibition.sheet.provenance`, `exhibition.sheet.provenanceMethod`, `exhibition.sheet.scribe`, `exhibition.sheet.shortDescription`, `exhibition.sheet.translationBy`, `exhibition.sheet.translationCopyeditedBy`, `exhibition.sheet.type`, `exhibition.sheet.workingNumber`, `exhibition.sheet.workshop`, `exhibition.ui.close`.
+
+
 ## 1.0.0
 
 - Initial release: the `core`, `layout`, `gallery` and `exhibition` namespaces
