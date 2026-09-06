@@ -358,10 +358,27 @@ export function siteDeclaration(dir, registry, problems) {
 
 // ── modes ──────────────────────────────────────────────────────────────────
 
+/**
+ * The languages a bundle's websites offer, as declared in `namespaces.json`
+ * under `languages`: every section the bundle contains must exist, complete,
+ * in each of them. Not declared means not required, which is how the rule
+ * stays optional for a fixture and mandatory for the real dictionary.
+ */
+function requiredLanguages(registry, bundle) {
+  const declared = registry.languages?.[bundle]
+  return Array.isArray(declared) ? declared : []
+}
+
+/** The entries of `base` that `data` lacks — what a translator has to add. */
+function missingEntries(data, base) {
+  return Object.keys(base).filter((key) => !(key in data))
+}
+
 export function checkDictionary(dir) {
   const problems = []
   const notes = []
   const registry = loadRegistry(dir)
+  const catalogues = {}
 
   for (const namespace of registry.namespaces) {
     const nsDir = join(dir, namespace)
@@ -410,6 +427,7 @@ export function checkDictionary(dir) {
       notes.push(coverage(`${namespace}/${language}`, data, base))
     }
     notes.push(`${namespace}: ${Object.keys(base).length} entries in English`)
+    catalogues[namespace] = parsed
   }
 
   for (const bundle of Object.keys(registry.bundles)) {
@@ -419,6 +437,39 @@ export function checkDictionary(dir) {
         `In **namespaces.json**, the \`${bundle}\` bundle lists unknown sections: ` +
           unknown.join(', ')
       )
+    }
+
+    // A website offers the languages its data package declares, and a visitor
+    // who picks one reads the whole page in it — the records from the package,
+    // the chrome from here. A section that has no file for that language, or
+    // an incomplete one, shows that visitor English labels between records in
+    // their language. So a bundle names the languages its websites offer, and
+    // every section it contains has to be complete in each of them. The
+    // shared sections are in every bundle, so they need the union.
+    for (const language of requiredLanguages(registry, bundle)) {
+      for (const namespace of registry.bundles[bundle]) {
+        const parsed = catalogues[namespace]
+        if (!parsed?.[BASE_LANGUAGE]) continue
+        const data = parsed[language]
+        if (!data) {
+          problems.push(
+            `**${namespace}/${language}.json** is missing. The \`${bundle}\` websites offer ` +
+              `\`${language}\`, so every section they receive has to exist in it — copy ` +
+              `${namespace}/en.json and translate it.`
+          )
+          continue
+        }
+        const missing = missingEntries(data, parsed[BASE_LANGUAGE])
+        if (missing.length) {
+          const shown = missing.slice(0, 8).map((k) => `\`${k}\``).join(', ')
+          problems.push(
+            `**${namespace}/${language}.json** is missing ${missing.length} entr` +
+              `${missing.length === 1 ? 'y' : 'ies'} that ${namespace}/en.json has: ${shown}` +
+              `${missing.length > 8 ? ', …' : ''}. The \`${bundle}\` websites offer ` +
+              `\`${language}\`, so this section has to be complete in it.`
+          )
+        }
+      }
     }
   }
 
@@ -546,16 +597,44 @@ export async function scanSources(dir, compiler) {
   return found
 }
 
-export async function checkApp(dir) {
+/**
+ * The languages a website offers: what its data package's `manifest.site.languages`
+ * declares — the same list viewer-core's `offeredLanguages()` reads — or the
+ * `--languages` option when the check is asked about a different set. A
+ * website has one data package, so the first `@metanull/*-data` found is it.
+ */
+export function offeredLanguages(dir, override) {
+  if (override) return { languages: override, from: 'the --languages option' }
+  const scope = join(dir, 'node_modules', '@metanull')
+  if (!existsSync(scope)) return null
+  for (const name of readdirSync(scope).sort()) {
+    if (!name.endsWith('-data')) continue
+    const manifest = join(scope, name, 'manifest.json')
+    if (!existsSync(manifest)) continue
+    let declared
+    try {
+      declared = JSON.parse(readFileSync(manifest, 'utf8'))?.site?.languages
+    } catch {
+      continue
+    }
+    if (!Array.isArray(declared)) continue
+    const languages = declared
+      .map((entry) => (typeof entry === 'string' ? entry : entry?.code))
+      .filter(Boolean)
+    return { languages, from: `@metanull/${name}` }
+  }
+  return null
+}
+
+export async function checkApp(dir, { languages: override } = {}) {
   const problems = []
   const notes = []
   const registry = loadRegistry(dir)
   const site = siteDeclaration(dir, registry, problems)
   if (!site) return { problems, notes }
 
-  const bundleFile = join(
-    dir, 'node_modules', '@metanull', 'viewer-i18n', 'dist', site.class, `${BASE_LANGUAGE}.json`
-  )
+  const bundleDir = join(dir, 'node_modules', '@metanull', 'viewer-i18n', 'dist', site.class)
+  const bundleFile = join(bundleDir, `${BASE_LANGUAGE}.json`)
   if (!existsSync(bundleFile)) {
     problems.push(
       `The shared texts are not installed, so the entries this website uses cannot be ` +
@@ -568,6 +647,46 @@ export async function checkApp(dir) {
   const local = existsSync(localFile) ? readJson(localFile, problems, 'locales/en.json') : {}
   if (!shared || !local) return { problems, notes }
   const effective = { ...shared, ...local }
+
+  // The languages the website offers are the languages a visitor can pick,
+  // and each of them has to reach the shared texts as well as the records.
+  // This is checked against what is installed — the bundle as delivered —
+  // rather than against a promise in the registry.
+  const offered = offeredLanguages(dir, override)
+  if (offered) {
+    const withoutLocal = []
+    for (const language of offered.languages) {
+      if (language === BASE_LANGUAGE) continue
+      const file = join(bundleDir, `${language}.json`)
+      const translated = existsSync(file) ? readJson(file, problems, `the shared texts in ${language}`) : null
+      if (!translated) {
+        problems.push(
+          `This website offers **${language}** (declared by ${offered.from}), but the shared ` +
+            `texts have no ${language} at all: a visitor choosing it would read every label, ` +
+            `button and heading in English. The dictionary's \`${site.class}\` languages ` +
+            `have to include \`${language}\`.`
+        )
+        continue
+      }
+      const missing = missingEntries(translated, shared)
+      if (missing.length) {
+        problems.push(
+          `This website offers **${language}** (declared by ${offered.from}), but the shared ` +
+            `texts in ${language} lack ${missing.length} of their ${Object.keys(shared).length} ` +
+            `entries, which would show in English. The dictionary has to complete them.`
+        )
+      }
+      if (!existsSync(join(dir, 'locales', `${language}.json`))) withoutLocal.push(language)
+    }
+    notes.push(`offers ${offered.languages.join(', ')} (from ${offered.from})`)
+    if (withoutLocal.length) {
+      notes.push(
+        `own entries have no file for ${withoutLocal.join(', ')}: those show in English`
+      )
+    }
+  } else {
+    notes.push('no data package installed, so the offered languages were not checked')
+  }
 
   const { references, dynamic, unreadable } = await scanSources(dir)
   if (unreadable.includes('no parser')) {
@@ -633,11 +752,21 @@ export function report(problems) {
 export async function main(argv, { writeReport } = {}) {
   const mode = argv.find((arg) => arg in MODES)
   if (!mode) {
-    console.error('Usage: viewer-i18n-check --dictionary|--site|--app [directory]')
+    console.error(
+      'Usage: viewer-i18n-check --dictionary|--site|--app [directory] [--languages ar,en,…]'
+    )
     return 2
   }
+  // `--languages` asks --app about a set other than the data package's — a
+  // website about to offer a language, or a check with no package installed.
+  const options = {}
+  const at = argv.indexOf('--languages')
+  if (at !== -1) {
+    options.languages = (argv[at + 1] ?? '').split(',').map((l) => l.trim()).filter(Boolean)
+    argv = argv.filter((_, i) => i !== at && i !== at + 1)
+  }
   const dir = resolve(argv[argv.indexOf(mode) + 1] ?? '.')
-  const { problems, notes } = await MODES[mode](dir)
+  const { problems, notes } = await MODES[mode](dir, options)
 
   for (const note of notes) console.log(`  ${note}`)
   if (!problems.length) {

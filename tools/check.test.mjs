@@ -9,7 +9,9 @@ import { dirname, join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { after, describe, it } from 'node:test'
 
-import { KEY_RE, checkApp, checkDictionary, checkSite, languageOf, scanSources } from './check.mjs'
+import {
+  KEY_RE, checkApp, checkDictionary, checkSite, languageOf, offeredLanguages, scanSources,
+} from './check.mjs'
 
 const repo = dirname(dirname(fileURLToPath(import.meta.url)))
 const temporary = []
@@ -172,6 +174,44 @@ describe('the dictionary', () => {
     assert.deepEqual(result.problems, [])
     assert.ok(result.notes.some((note) => note.includes('core/fr: 1/2')))
   })
+
+  // A website offers the languages its data package declares, and a visitor
+  // who picks one reads the whole page in it. Islamic Art declares ten; every
+  // site shipped English chrome in all of them until the dictionary carried
+  // the languages too. This is the rule that keeps it carrying them.
+  describe('the languages a bundle promises', () => {
+    const promising = { ...registry, languages: { gallery: ['en', 'fr'] } }
+
+    it('requires every section of the bundle to exist in each of them', () => {
+      const result = checkDictionary(dictionary({ 'namespaces.json': promising }))
+      const messages = messagesOf(result)
+      assert.match(messages, /\*\*core\/fr\.json\*\* is missing/)
+      assert.match(messages, /\*\*gallery\/fr\.json\*\* is missing/)
+      // exhibition is not in the gallery bundle, so nothing is asked of it.
+      assert.doesNotMatch(messages, /exhibition\/fr/)
+    })
+
+    it('requires each of those files to be complete', () => {
+      const result = checkDictionary(
+        dictionary({
+          'namespaces.json': { ...promising, bundles: { gallery: ['core'] } },
+          'core/en.json': { 'core.nav.home': 'Home', 'core.nav.back': 'Back' },
+          'core/fr.json': { 'core.nav.home': 'Accueil' },
+        })
+      )
+      assert.match(messagesOf(result), /core\/fr\.json\*\* is missing 1 entry .*`core\.nav\.back`/)
+    })
+
+    it('is satisfied by complete files, and asks nothing of a bundle that promises none', () => {
+      const result = checkDictionary(
+        dictionary({
+          'namespaces.json': { ...promising, bundles: { gallery: ['core'], standalone: ['core'] } },
+          'core/fr.json': { 'core.nav.home': 'Accueil' },
+        })
+      )
+      assert.deepEqual(result.problems, [])
+    })
+  })
 })
 
 describe('a website', () => {
@@ -305,5 +345,56 @@ describe('the call sites', () => {
       'node_modules/@metanull/viewer-i18n/dist/gallery/en.json': { 'gallery.sheet.name': 'Name:' },
     })
     assert.deepEqual((await checkApp(dir)).problems, [])
+  })
+})
+
+describe('the languages a website offers', () => {
+  const app = (files = {}) =>
+    scratch({
+      'package.json': { name: 'carpets', viewerI18n: { class: 'gallery', namespace: 'carpets' } },
+      'locales/en.json': {},
+      'node_modules/@metanull/viewer-i18n/dist/gallery/en.json': {
+        'gallery.sheet.name': 'Name:',
+        'gallery.nav.about': 'About',
+      },
+      'node_modules/@metanull/carpets-data/manifest.json': {
+        site: { languages: [{ code: 'ar', label: 'العربية' }, { code: 'en', label: 'English' }] },
+      },
+      ...files,
+    })
+
+  it('are read from the data package, the way the website reads them', () => {
+    const dir = app()
+    assert.deepEqual(offeredLanguages(dir), { languages: ['ar', 'en'], from: '@metanull/carpets-data' })
+  })
+
+  it('must each reach the shared texts', async () => {
+    // The gallery bundle installed here has no Arabic at all.
+    assert.match(messagesOf(await checkApp(app())), /offers \*\*ar\*\*.*no ar at all/)
+  })
+
+  it('must each reach every shared text', async () => {
+    const dir = app({
+      'node_modules/@metanull/viewer-i18n/dist/gallery/ar.json': { 'gallery.sheet.name': 'الاسم:' },
+    })
+    assert.match(messagesOf(await checkApp(dir)), /offers \*\*ar\*\*.*lack 1 of their 2 entries/)
+  })
+
+  it('are satisfied by a complete bundle, and say where the own entries fall back', async () => {
+    const dir = app({
+      'node_modules/@metanull/viewer-i18n/dist/gallery/ar.json': {
+        'gallery.sheet.name': 'الاسم:',
+        'gallery.nav.about': 'نبذة',
+      },
+    })
+    const result = await checkApp(dir)
+    assert.deepEqual(result.problems, [])
+    assert.ok(result.notes.some((note) => note.includes('own entries have no file for ar')))
+  })
+
+  it('can be asked about another set with --languages', async () => {
+    const result = await checkApp(app(), { languages: ['en', 'fr'] })
+    assert.match(messagesOf(result), /offers \*\*fr\*\* \(declared by the --languages option\)/)
+    assert.doesNotMatch(messagesOf(result), /\*\*ar\*\*/)
   })
 })

@@ -1,8 +1,13 @@
 {
-  "namespaces": ["core", "layout", "gallery", "exhibition"],
+  "namespaces": ["core", "layout", "catalogue", "sheet", "record", "gallery", "exhibition"],
   "bundles": {
-    "standalone": ["core", "layout"],
-    "gallery": ["core", "layout", "gallery"],
-    "exhibition": ["core", "layout", "exhibition"]
+    "standalone": ["core", "layout", "catalogue", "sheet", "record"],
+    "gallery": ["core", "layout", "catalogue", "sheet", "record", "gallery"],
+    "exhibition": ["core", "layout", "catalogue", "sheet", "record", "exhibition"]
+  },
+  "languages": {
+    "standalone": ["ar", "cs", "de", "el", "en", "es", "fr", "it", "pt", "se", "tr"],
+    "gallery": ["ar", "en", "es", "fr"],
+    "exhibition": ["en"]
   }
 }

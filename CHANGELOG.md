@@ -79,3 +79,37 @@
 - `layout.nav.menu`, the label of the hamburger button viewer-layout 2.1.0's
   navigation shows on a narrow screen, so no website keeps a menu of its own.
 - Both in English, French, Spanish and Arabic.
+
+## 1.7.0
+
+Wave A of the shared-pages epic (metanull/inventory-app#1691): the vocabulary
+the list pages and the record page of every website share, in every language
+any website offers.
+
+- Three namespaces in every bundle: `catalogue` (the filters, the search
+  form, the results and their pages — 59 entries), `sheet` (the labels of a
+  record's sheet, `sheet.field.*` — 43), `record` (what surrounds the sheet:
+  back, timeline, related, credits, citation, glossary — 27). A shared label
+  carries no trailing colon; the page decides that.
+- `core.action.*` — the verbs of the landing cards and the controls (add,
+  apply, back, browse, close, explore, go, read, reset, search, viewDetails)
+  — and `core.project.*`, one entry per project of `mwnf3.projectnames`, so
+  a project name is looked up once rather than written into six files.
+- **Every language a website offers.** The data packages declare Islamic
+  Art in ten site languages, Baroque Art in five, the galleries in four; the
+  bundles had English chrome for all but four of them. `core`, `layout`,
+  `catalogue`, `sheet` and `record` now exist, complete, in
+  `ar cs de el en es fr it pt se tr`, and `gallery` in `ar es fr` besides
+  English. The legacy websites' term tables are the source wherever they had
+  a real translation of the same label; [`sources.md`](sources.md) is the
+  trace. `se` is Swedish, named after the code the packages declare.
+- `namespaces.json` names, per kind of website, the languages its websites
+  offer (`languages`), and `--dictionary` refuses a section that is missing
+  one of them or an entry in one. `--app` reads the languages a website
+  offers from its data package's `manifest.site.languages` and refuses an
+  installed bundle that does not cover them; `--languages` asks about another
+  set.
+- `gallery.*` and `exhibition.*` keep every entry they had, including the
+  ~170 the two share and the ones the new namespaces now say again. Nothing
+  reads the new ones yet; the websites move over one by one, and the
+  duplicates go in a later major once nothing reads them.

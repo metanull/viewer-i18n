@@ -57,15 +57,42 @@ those exact characters, angle brackets and all. Use Markdown.
 | `core/` | the pages every website builds on |
 | `layout/` | the frame around a page: navigation, language chooser, footer |
 | `gallery/` | the galleries (Carpets, Amulets, …) |
+| `catalogue/` | the list pages every website has: the filters, the search form, the results and their pages |
+| `sheet/` | the labels of a record's sheet — name, date, dimensions, provenance, who prepared it |
+| `record/` | what surrounds the sheet: back, timeline, related items, credits, citation, the glossary |
 | `exhibition/` | the exhibitions (Water in Islam, The Use of Colours in Art, …) |
 
 `gallery/` and `exhibition/` stay separate even where they say the same thing.
 A change to a gallery text must never reach an exhibition by surprise, and that
-is worth repeating a label for.
+is worth repeating a label for. `catalogue/`, `sheet/` and `record/` are the
+opposite case: one label for the same thing on every website, so that the
+seven websites read one sheet vocabulary rather than seven.
 
 Entry names are written as `section.group.name` — three parts, so
 `gallery.sheet.inventoryNumber` reads as "in the galleries, on the item sheet,
-the inventory number".
+the inventory number", and `sheet.field.inventoryNumber` "on any sheet, the
+field, the inventory number".
+
+A shared label carries no trailing colon: whether a label ends in a colon is a
+matter of layout, which the page decides.
+
+## Which languages a section must exist in
+
+A website offers the languages its data package declares, and a visitor who
+picks one reads the whole page in it — the records from the package, the
+texts from here. So each kind of website names, in `namespaces.json` under
+`languages`, the languages its websites offer, and **every section that kind
+receives has to be complete in each of them**. The shared sections are in
+every bundle, so they need the union: today `ar cs de el en es fr it pt se tr`.
+The automatic check refuses a section that is missing a language, or an entry
+in one, that a website of that kind offers.
+
+To add a language a website is about to offer: add it to the kind's list,
+then create the file in every section that kind receives. [`sources.md`](sources.md)
+says where the existing translations came from.
+
+`se` is Swedish: the data packages declare it with the legacy code, and the
+websites match codes as written, so the file is named after what they say.
 
 ## For developers
 
@@ -73,9 +100,9 @@ Each kind of website receives one prebuilt bundle, and nothing else:
 
 | Kind | Bundle | Contains |
 | --- | --- | --- |
-| Products (Islamic Art, Baroque Art, Sharing History) | `@metanull/viewer-i18n/standalone` | `core` + `layout` |
-| Galleries | `@metanull/viewer-i18n/gallery` | `core` + `layout` + `gallery` |
-| Exhibitions | `@metanull/viewer-i18n/exhibition` | `core` + `layout` + `exhibition` |
+| Products (Islamic Art, Baroque Art, Sharing History) | `@metanull/viewer-i18n/standalone` | `core` + `layout` + `catalogue` + `sheet` + `record` |
+| Galleries | `@metanull/viewer-i18n/gallery` | the same, + `gallery` |
+| Exhibitions | `@metanull/viewer-i18n/exhibition` | the same, + `exhibition` |
 
 ```js
 import { catalogues } from '@metanull/viewer-i18n/gallery'
@@ -107,7 +134,14 @@ rules on their own texts:
 ```bash
 npx viewer-i18n-check --site .   # a website's locales/, on its own
 npx viewer-i18n-check --app .    # …and every entry its code asks for
+npx viewer-i18n-check --app . --languages ar,en,fr   # …for a set other than the package's
 ```
+
+`--app` also reads the languages the website offers — `manifest.site.languages`
+of the installed `@metanull/<dataset>-data`, the list the website itself reads —
+and fails when the installed bundle has no complete file for one of them: that
+visitor would read the records in their language and every label in English.
+`--languages` asks about another set, for a website about to offer one.
 
 ## Release procedure
 
