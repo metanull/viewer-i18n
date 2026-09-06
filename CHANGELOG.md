@@ -1,5 +1,15 @@
 # Changelog
 
+## 2.0.1
+
+- Restored `gallery.search.howTo` and `exhibition.search.howTo` — the essay on
+  the boolean search operators that the "How to search" page of every DXA
+  website renders. 2.0.0 removed them as duplicates of
+  `catalogue.search.howTo`, which is the *link label* "How to search", not the
+  essay; the mistake survived the release because the downstream check
+  builds and tests a website but does not run its text check, and the essay
+  is asked for through an `I18nText` keypath the removal's grep did not read.
+  The four websites' text checks caught it on the first bump. Additive.
 ## 2.0.0
 
 Wave E of the shared-pages epic (metanull/inventory-app#1691), the last
