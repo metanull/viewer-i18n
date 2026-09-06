@@ -133,6 +133,13 @@ npx viewer-i18n-check --app .    # …and every entry its code asks for
 npx viewer-i18n-check --app . --languages ar,en,fr   # …for a set other than the package's
 ```
 
+`--app` reads a name wherever the website asks for one: a `t('…')` or `$t('…')`
+call, an `I18nText` keypath, and — since 2.1.0 — a name written in a spec the
+platform renders, such as `title: 'carpets.identity.title'` in a
+`dataset.config.js` or a label in a catalogue or sheet spec for viewer-layout's
+composed views. A plain string reads as a name when it has three parts and its
+first is a section the website receives; every name found has to exist.
+
 `--app` also reads the languages the website offers — `manifest.site.languages`
 of the installed `@metanull/<dataset>-data`, the list the website itself reads —
 and fails when the installed bundle has no complete file for one of them: that
