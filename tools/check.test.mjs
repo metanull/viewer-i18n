@@ -281,6 +281,29 @@ describe('the call sites', () => {
     assert.equal((await scanSources(dir)).dynamic.length, 1)
   })
 
+  it('reads a name written in a spec, under a section the website receives', async () => {
+    // The composed views render a spec: the names in it are asked for by the
+    // platform, not by a call in the website. Any other three-part string —
+    // a file, a route — is not a name.
+    const dir = scratch({
+      'src/spec.js': [
+        'export const sheet = {',
+        "  back: { label: 'record.action.backToResults' },",
+        "  title: 'carpets.identity.title',",
+        "  file: 'items.json.gz',",
+        "  other: 'somewhere.else.entirely',",
+        '}',
+      ].join('\n'),
+    })
+    const namespaces = new Set(['record', 'carpets'])
+    assert.deepEqual(
+      [...(await scanSources(dir, undefined, { namespaces })).references.keys()].sort(),
+      ['carpets.identity.title', 'record.action.backToResults']
+    )
+    // Without the sections, a plain string is only a string.
+    assert.deepEqual([...(await scanSources(dir)).references.keys()], [])
+  })
+
   it('does not read a component\'s own t() as a text being asked for', async () => {
     // This is why the rule is parsed rather than matched. `t` here is a local
     // helper — a real component had one, and the regular expression reported
@@ -333,6 +356,16 @@ describe('the call sites', () => {
       'node_modules/@metanull/viewer-i18n/dist/gallery/en.json': { 'gallery.sheet.name': 'Name:' },
     })
     assert.match(messagesOf(await checkApp(dir)), /does not exist/)
+  })
+
+  it('rejects a name written in a spec that the website cannot resolve', async () => {
+    const dir = scratch({
+      'package.json': { name: 'carpets', viewerI18n: { class: 'gallery', namespace: 'carpets' } },
+      'locales/en.json': {},
+      'src/spec.js': "export const sheet = { title: 'gallery.sheet.missing' }",
+      'node_modules/@metanull/viewer-i18n/dist/gallery/en.json': { 'gallery.sheet.name': 'Name:' },
+    })
+    assert.match(messagesOf(await checkApp(dir)), /gallery\.sheet\.missing.*does not exist/)
   })
 
   it('accepts a name that comes from the shared texts', async () => {

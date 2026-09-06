@@ -163,7 +163,7 @@ function eachNode(node, scope, visit) {
  * compiled before it is read, so its lines are the compiled ones and it
  * reports the file instead.
  */
-function collectFromScript(compiler, code, where, { line = 0, detectT = true, i18nT = false, found }) {
+function collectFromScript(compiler, code, where, { line = 0, detectT = true, i18nT = false, found, namespaces = null }) {
   let ast
   try {
     ast = compiler.babelParse(code, { sourceType: 'module', errorRecovery: true })
@@ -185,6 +185,20 @@ function collectFromScript(compiler, code, where, { line = 0, detectT = true, i1
     ) {
       if (node.value?.type === 'StringLiteral') record(node.value.value, node)
       else found.dynamic.push(at(node))
+      return
+    }
+    // A name written in a spec — `title: 'carpets.identity.title'` in a
+    // dataset.config.js, a label in a catalogue or sheet spec the composed
+    // views render — is asked for by the platform, not by a call the
+    // website makes. It reads as one when its first part is a section this
+    // website receives; any other three-part string is left alone.
+    if (
+      namespaces &&
+      node.type === 'StringLiteral' &&
+      KEY_RE.test(node.value) &&
+      namespaces.has(node.value.split('.')[0])
+    ) {
+      record(node.value, node)
       return
     }
     if (node.type !== 'CallExpression') return
@@ -549,7 +563,7 @@ function sourceFiles(dir) {
 }
 
 /** Every key the code asks for, and every place it asks with something else. */
-export async function scanSources(dir, compiler) {
+export async function scanSources(dir, compiler, { namespaces = null } = {}) {
   const found = { references: new Map(), dynamic: [], unreadable: [] }
   const parser = compiler ?? (await loadCompiler(dir))
   if (!parser) {
@@ -562,7 +576,7 @@ export async function scanSources(dir, compiler) {
     const where = relative(dir, file).replaceAll('\\', '/')
 
     if (!file.endsWith('.vue')) {
-      collectFromScript(parser, text, where, { found })
+      collectFromScript(parser, text, where, { found, namespaces })
       continue
     }
 
@@ -578,7 +592,7 @@ export async function scanSources(dir, compiler) {
     for (const block of [descriptor.script, descriptor.scriptSetup]) {
       if (!block) continue
       const line = (block.loc?.start.line ?? 1) - 1
-      i18nT = collectFromScript(parser, block.content, where, { line, found }) || i18nT
+      i18nT = collectFromScript(parser, block.content, where, { line, found, namespaces }) || i18nT
     }
 
     if (!descriptor.template) continue
@@ -591,7 +605,7 @@ export async function scanSources(dir, compiler) {
       found.unreadable.push(`${where}: ${compiled.errors[0].message ?? compiled.errors[0]}`)
       continue
     }
-    collectFromScript(parser, compiled.code, where, { line: null, detectT: false, i18nT, found })
+    collectFromScript(parser, compiled.code, where, { line: null, detectT: false, i18nT, found, namespaces })
   }
 
   return found
@@ -688,7 +702,9 @@ export async function checkApp(dir, { languages: override } = {}) {
     notes.push('no data package installed, so the offered languages were not checked')
   }
 
-  const { references, dynamic, unreadable } = await scanSources(dir)
+  const { references, dynamic, unreadable } = await scanSources(dir, undefined, {
+    namespaces: new Set(site.allowed),
+  })
   if (unreadable.includes('no parser')) {
     problems.push(
       'The website\'s own Vue compiler could not be found, so its code cannot be read. ' +

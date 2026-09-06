@@ -1,5 +1,16 @@
 # Changelog
 
+## 2.1.0
+
+- `viewer-i18n-check --app` reads a name written in a spec — `title:
+  'carpets.identity.title'` in a `dataset.config.js`, a label in a catalogue
+  or sheet spec that viewer-layout's composed views render — as a name the
+  website asks for: it has to exist, and it counts as used. A plain string
+  reads as one when it has three parts and its first is a section the
+  website receives. Before this, a website on the composed views had its
+  own entries reported unused and a misspelt label in a spec went unseen.
+  Additive; no entry changes.
+
 ## 2.0.1
 
 - Restored `gallery.search.howTo` and `exhibition.search.howTo` — the essay on
