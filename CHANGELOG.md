@@ -1,5 +1,69 @@
 # Changelog
 
+## 2.3.0
+
+Wave G of the shared-pages epic (metanull/inventory-app#1692/#1695), walkthrough
+step 30 (metanull/viewer-i18n#19): two new sections, `timeline` and `partner`,
+in every bundle. Decision D6: neutral wording — "in this site", never
+"Gallery" or "Exhibition" — so the one text serves a gallery, an exhibition
+and a standalone site; product wording stays only in `gallery` and
+`exhibition`. Additive: nothing removed, nothing renamed.
+
+- **`timeline/`**, 24 entries (`timeline.nav.*`, `.form.*`, `.results.*`,
+  `.action.*`): the twelve entries byte-identical between `gallery` and
+  `exhibition` (`allCountries`, `backToEvents`, `beginFullSearch`, `earliest`,
+  `latest`, `galleryHeading`, `noEvents`, `noResults`, `searchIntro`,
+  `selectCountry`, `to`, `countryDescription`), plus fourteen more identical
+  across islamicart, baroqueart and sharinghistory's own `timeline.*`,
+  `results.*`, `action.*` and `filter.*` prefixes. `selectCountry`, `to`,
+  `startDate`, `endDate` and `yearSuffix` reuse `catalogue.facet.*` and
+  `catalogue.era.ad` rather than the gallery/exhibition wording, since the
+  meaning and the existing eleven-language translations are the same. One
+  entry, `seeGallery` ("See Gallery"), keeps the word "Gallery" on purpose —
+  it names the object grid a timeline period links to (legacy's
+  `gn_see_gallery`, decision D1 restoring it to the standalone sites too),
+  not the product family, so it is not a D6 violation.
+- **`partner/`**, 22 entries (`partner.info.*`, `.map.*`, `.list.*`, `.nav.*`,
+  `.item.*`): fifteen entries identical between `gallery.partner.*` and
+  `exhibition.partner.*`, plus entries the three standalone sites already
+  triplicate under their own `partner.*` and `notFound.partner` /
+  `results.partnersFound`. Two wording forks, resolved:
+  - `fax` and `phone` were `"F"` / `"T"` in `gallery`/`exhibition` (a
+    letter prefixing a number) and `"Fax"` / `"Phone"` on the three
+    standalone sites; the full word won, since it reads on its own wherever
+    the shared entry is used without the number beside it. The `gallery` and
+    `exhibition` namespaces keep their own abbreviated entries unchanged.
+  - `associated` was `"Associated Museums"` / `"Associated Institutions"`
+    (islamicart, baroqueart) against sharinghistory's single
+    `"Associated Partners"`; the generic form won, since the new entry has
+    no `typeMuseum`/`typeInstitution` split of its own.
+  - `back` takes islamicart/baroqueart/sharinghistory's `"Back to Partners"`;
+    their separate `"Return to Partners"` (`returnLink`) is untouched — a
+    second, different link on the same pages, not a duplicate of this one.
+  - `objectsInSite` rewrites `gallery.partner.objectsInGallery` /
+    `exhibition.partner.objectsInExhibition` ("object(s) in this Gallery" /
+    "…Exhibition") to "object(s) in this site" per D6; the ar/es/fr
+    translations are the same mechanical substitution, the site-type word
+    swapped for the neutral one, on the existing gallery translations.
+- Translations: `ar`, `es` and `fr` are real wherever the entry already
+  existed in `gallery/{ar,es,fr}.json` (all of `timeline` but the seven
+  standalone-only entries above; most of `partner`). `selectCountry`, `to`,
+  `startDate`, `endDate` and `yearSuffix` are real in all eleven languages,
+  reused from `catalogue/`. `partner.info.about`, `.contact`, `.fax`,
+  `.logo` and `.phone` additionally carry real `de`, `it`, `pt` and/or `tr`
+  from the legacy `mwnf3` translation table (word IDs `About`/`about`,
+  `Contact`/`contact`, `Fax`, `logo`, `Phone`) — a legacy row that merely
+  repeated the English was skipped, as `sources.md` already does (this
+  dropped French `Phone`, which legacy left untranslated). Everything else —
+  `cs`, `el` and `se` throughout, and every language for the sixteen
+  entries sourced only from islamicart/baroqueart/sharinghistory's
+  English-only `locales/en.json` (`errorSelect`, `errorPeriod`, `backLink`,
+  `eventsFound`, `viewItemsFromPeriod`, `fromYearHint`,
+  `toYearHint`, `none`, `typeMuseum`, `typeInstitution`, `museums`,
+  `institutions`, `associated`, `partnersFound`, `back`, `notFound`) — is
+  English, as 2.2.0 did for `exhibition`; none of these was ever translated
+  by MWNF for any site that reads it.
+
 ## 2.2.0
 
 Wave 0 of the shared-pages epic (metanull/inventory-app#1692/#1693), walkthrough
