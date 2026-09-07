@@ -61,8 +61,10 @@ those exact characters, angle brackets and all. Use Markdown.
 | `sheet/` | the labels of a record's sheet — name, date, dimensions, provenance, who prepared it |
 | `record/` | what surrounds the sheet: back, timeline, related items, credits, citation, the glossary |
 | `exhibition/` | the exhibitions (Water in Islam, The Use of Colours in Art, …) |
+| `timeline/` | the timeline pages: the country and period form, the results, the errors — worded so the same text serves a gallery, an exhibition or a standalone site |
+| `partner/` | the partner pages: the profile fields, the map, the list and its sorting, "not found" — worded the same way |
 
-`gallery/` and `exhibition/` hold only what a gallery or an exhibition says and no other kind of website does — the sections, the navigation, the partner page, the timeline pages, the notices, the themes. What every website says the same way lives once, in `catalogue/`, `sheet/` and `record/`, so that the seven websites read one vocabulary rather than seven; since 2.0.0 the two family sections carry no copy of it.
+`gallery/` and `exhibition/` hold only what a gallery or an exhibition says and no other kind of website does — the sections, the navigation, the partner page's intro, the timeline page's intro, the notices, the themes. What every website says the same way lives once, in `catalogue/`, `sheet/`, `record/`, `timeline/` and `partner/`, so that the seven websites read one vocabulary rather than seven; since 2.0.0 the two family sections carry no copy of it. `timeline/` and `partner/` carry no product name: they say "in this site", never "Gallery" or "Exhibition", so the one text serves every kind of website — the few entries whose wording is a product's own stay in `gallery` and `exhibition`.
 
 Entry names are written as `section.group.name` — three parts, so
 `gallery.sheet.inventoryNumber` reads as "in the galleries, on the item sheet,
@@ -96,9 +98,9 @@ Each kind of website receives one prebuilt bundle, and nothing else:
 
 | Kind | Bundle | Contains |
 | --- | --- | --- |
-| Products (Islamic Art, Baroque Art, Sharing History) | `@metanull/viewer-i18n/standalone` | `core` + `layout` + `catalogue` + `sheet` + `record` + `exhibition` |
-| Galleries | `@metanull/viewer-i18n/gallery` | the same, + `gallery` |
-| Exhibitions | `@metanull/viewer-i18n/exhibition` | the same, + `exhibition` |
+| Products (Islamic Art, Baroque Art, Sharing History) | `@metanull/viewer-i18n/standalone` | `core` + `layout` + `catalogue` + `sheet` + `record` + `exhibition` + `timeline` + `partner` |
+| Galleries | `@metanull/viewer-i18n/gallery` | the same, with `gallery` in place of `exhibition` |
+| Exhibitions | `@metanull/viewer-i18n/exhibition` | the same as Products |
 
 ```js
 import { catalogues } from '@metanull/viewer-i18n/gallery'

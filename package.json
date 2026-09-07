@@ -1,7 +1,7 @@
 {
   "name": "@metanull/viewer-i18n",
-  "version": "2.2.0",
-  "description": "Shared static texts for the MWNF website platform: the core, layout, catalogue, sheet, record, gallery and exhibition namespaces.",
+  "version": "2.3.0",
+  "description": "Shared static texts for the MWNF website platform: the core, layout, catalogue, sheet, record, gallery, exhibition, timeline and partner namespaces.",
   "type": "module",
   "license": "UNLICENSED",
   "repository": {
