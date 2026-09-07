@@ -9,7 +9,7 @@ in every bundle. Decision D6: neutral wording — "in this site", never
 and a standalone site; product wording stays only in `gallery` and
 `exhibition`. Additive: nothing removed, nothing renamed.
 
-- **`timeline/`**, 25 entries (`timeline.nav.*`, `.form.*`, `.results.*`,
+- **`timeline/`**, 24 entries (`timeline.nav.*`, `.form.*`, `.results.*`,
   `.action.*`): the twelve entries byte-identical between `gallery` and
   `exhibition` (`allCountries`, `backToEvents`, `beginFullSearch`, `earliest`,
   `latest`, `galleryHeading`, `noEvents`, `noResults`, `searchIntro`,
@@ -22,11 +22,7 @@ and a standalone site; product wording stays only in `gallery` and
   entry, `seeGallery` ("See Gallery"), keeps the word "Gallery" on purpose —
   it names the object grid a timeline period links to (legacy's
   `gn_see_gallery`, decision D1 restoring it to the standalone sites too),
-  not the product family, so it is not a D6 violation. One entry,
-  `forSearch`, names no existing text on any site; `"for search"` is a guess
-  at a connector paired with `fromYearHint`/`toYearHint`, on the model of
-  `catalogue.results.forProject` — worth a second look once a site actually
-  reads it.
+  not the product family, so it is not a D6 violation.
 - **`partner/`**, 22 entries (`partner.info.*`, `.map.*`, `.list.*`, `.nav.*`,
   `.item.*`): fifteen entries identical between `gallery.partner.*` and
   `exhibition.partner.*`, plus entries the three standalone sites already
@@ -50,7 +46,7 @@ and a standalone site; product wording stays only in `gallery` and
     translations are the same mechanical substitution, the site-type word
     swapped for the neutral one, on the existing gallery translations.
 - Translations: `ar`, `es` and `fr` are real wherever the entry already
-  existed in `gallery/{ar,es,fr}.json` (all of `timeline` but the eight
+  existed in `gallery/{ar,es,fr}.json` (all of `timeline` but the seven
   standalone-only entries above; most of `partner`). `selectCountry`, `to`,
   `startDate`, `endDate` and `yearSuffix` are real in all eleven languages,
   reused from `catalogue/`. `partner.info.about`, `.contact`, `.fax`,
@@ -59,10 +55,10 @@ and a standalone site; product wording stays only in `gallery` and
   `Contact`/`contact`, `Fax`, `logo`, `Phone`) — a legacy row that merely
   repeated the English was skipped, as `sources.md` already does (this
   dropped French `Phone`, which legacy left untranslated). Everything else —
-  `cs`, `el` and `se` throughout, and every language for the seventeen
+  `cs`, `el` and `se` throughout, and every language for the sixteen
   entries sourced only from islamicart/baroqueart/sharinghistory's
   English-only `locales/en.json` (`errorSelect`, `errorPeriod`, `backLink`,
-  `eventsFound`, `viewItemsFromPeriod`, `forSearch`, `fromYearHint`,
+  `eventsFound`, `viewItemsFromPeriod`, `fromYearHint`,
   `toYearHint`, `none`, `typeMuseum`, `typeInstitution`, `museums`,
   `institutions`, `associated`, `partnersFound`, `back`, `notFound`) — is
   English, as 2.2.0 did for `exhibition`; none of these was ever translated
