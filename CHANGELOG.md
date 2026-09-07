@@ -1,5 +1,33 @@
 # Changelog
 
+## 2.2.0
+
+Wave 0 of the shared-pages epic (metanull/inventory-app#1692/#1693), walkthrough
+step 11 (metanull/viewer-i18n#18): the `exhibition` namespace joins the
+`standalone` bundle.
+
+- islamicart, baroqueart and sharinghistory each carried nine
+  `<site>.exhibition.*` entries whose English duplicated `exhibition.*`
+  word for word, and had no way to read `exhibition.theme.*` at all — the
+  `exhibition` namespace was built only into the `gallery` and `exhibition`
+  bundles. `namespaces.json` now lists it under `standalone` too, so the
+  three product sites read the one shared copy instead of keeping their
+  own, and gain the theme entries besides. Additive: a bundle gains
+  entries, nothing is removed.
+- `exhibition/ar.json`, `cs.json`, `de.json`, `el.json`, `es.json`,
+  `fr.json`, `it.json`, `pt.json`, `se.json` and `tr.json` — English, like
+  `en.json`. MWNF never translated the exhibition write-ups; that is
+  already the standing rule for the section, not something this change
+  invents — the `exhibition` bundle's own websites have only ever promised
+  `en` for it (`namespaces.json`'s `languages.exhibition`), and the nine
+  duplicated entries the three sites are dropping were themselves English
+  in every language they shipped. Joining `standalone`, which promises
+  eleven languages, means the section's files have to exist in all of
+  them for `viewer-i18n-check` to pass; the files exist so the check
+  passes and a visitor in any language still reads the same English
+  exhibition text they already did. A real translation, if MWNF ever
+  commissions one, replaces these files without touching the registry.
+
 ## 2.1.0
 
 - `viewer-i18n-check --app` reads a name written in a spec — `title:

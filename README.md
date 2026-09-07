@@ -96,7 +96,7 @@ Each kind of website receives one prebuilt bundle, and nothing else:
 
 | Kind | Bundle | Contains |
 | --- | --- | --- |
-| Products (Islamic Art, Baroque Art, Sharing History) | `@metanull/viewer-i18n/standalone` | `core` + `layout` + `catalogue` + `sheet` + `record` |
+| Products (Islamic Art, Baroque Art, Sharing History) | `@metanull/viewer-i18n/standalone` | `core` + `layout` + `catalogue` + `sheet` + `record` + `exhibition` |
 | Galleries | `@metanull/viewer-i18n/gallery` | the same, + `gallery` |
 | Exhibitions | `@metanull/viewer-i18n/exhibition` | the same, + `exhibition` |
 

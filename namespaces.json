@@ -1,7 +1,7 @@
 {
   "namespaces": ["core", "layout", "catalogue", "sheet", "record", "gallery", "exhibition"],
   "bundles": {
-    "standalone": ["core", "layout", "catalogue", "sheet", "record"],
+    "standalone": ["core", "layout", "catalogue", "sheet", "record", "exhibition"],
     "gallery": ["core", "layout", "catalogue", "sheet", "record", "gallery"],
     "exhibition": ["core", "layout", "catalogue", "sheet", "record", "exhibition"]
   },
