@@ -64,6 +64,65 @@ and a standalone site; product wording stays only in `gallery` and
   English, as 2.2.0 did for `exhibition`; none of these was ever translated
   by MWNF for any site that reads it.
 
+Walkthrough step 31 (metanull/viewer-i18n#20): the search vocabulary the
+three standalone sites triplicated, the DXA theme pages' wording, and the
+glossary/dynasty popout labels the item sheet needs. Additive.
+
+- **`catalogue/`**, 9 entries (`catalogue.field.artist`, `.keywords`,
+  `.material`, `.other`, `.patron`, `catalogue.search.howToEssay`, `.intro`,
+  `.keywordOne`, `.keywordTwo`, `.keywordThree`): the search essay
+  `gallery.search.howTo` / `exhibition.search.howTo` restored by 2.0.1 —
+  still byte-identical between the two — plus the field names and search
+  intro the three standalone sites triplicate under their own
+  `<site>.search.*` / `<site>.field.*`. The essay is named
+  `catalogue.search.howToEssay`, not `catalogue.search.howTo`: that shorter
+  name is already taken, by the *link label* "How to search" 2.0.1 tells the
+  story of restoring the essay away from — `SearchResults.vue` /
+  `CollectionSearch.vue` in colours, water-in-islam, amulets and carpets
+  render it as a `RouterLink`'s clickable text, and giving it the essay
+  would turn that link into the whole Boolean-search write-up.
+  `fromYearHint` / `toYearHint` are not duplicated here — #19 already added
+  them as `timeline.form.fromYearHint` / `.toYearHint`, and the meaning is
+  the same wherever a year hint is shown.
+- **`record/`**, 3 entries: `record.glossary.tool` ("Glossary tool"), beside
+  the existing `record.glossary.heading` / `.instructions` / `.definition`,
+  which already say what the DXA item sheets' glossary popout needs and are
+  untouched. `record.dynasty.heading` and `record.dynasty.list`, both
+  "Dynasties" — the neutral form of two different wordings on the same item
+  sheet: `gallery.nav.dynastiesHeading` ("THE DYNASTIES", a dynasty
+  popout's own title) and `gallery.nav.islamicDynasties` ("Islamic
+  Dynasties / Period", the heading above the list of an item's dynasties).
+  Two UI slots, the same neutral word for both — neither needs the
+  "Islamic" qualifier once it is read beyond islamicart.
+- **`exhibition/`**, 14 entries (`exhibition.theme.romanLabel`,
+  `.seeGalleryFor`, `.seeAllInTheme`, `.galleryLabel`, `.recordNotInSite`,
+  `exhibition.related.notAvailable`, `exhibition.relatedCategory.furtherReading`,
+  `.mwnfContent`, `.partnerContent`, `.otherContent`, `.unknown`,
+  `exhibition.chapter.previous`, `.next`, `.returnToExhibitions`): the theme
+  and related-content wording the-use-of-colours-in-art added in wave 0
+  under its own `colours.*` prefix, plus sharinghistory's chapter
+  navigation (`nextChapter` / `previousChapter` / `returnLink`, renamed to
+  the neutral `chapter.next` / `.previous` / `.returnToExhibitions`).
+  Decision D6 reaches one entry here even though `exhibition/` is a product
+  section: `recordNotInSite` rewrites colours' `theme.recordNotInExhibition`
+  ("…is not part of this exhibition") to "…is not part of this site",
+  because `exhibition/` has been in the `standalone` bundle since 2.2.0 and
+  a product site reading it should not be told about an "exhibition" it
+  isn't one. The other four theme entries keep "Theme" and "Gallery"
+  unchanged — "Gallery" names the object grid a theme links into, the
+  README's standing exception, not the product.
+- Translations: `catalogue.search.howToEssay` is real in `ar`, `es` and
+  `fr`, copied from `gallery.search.howTo` — the pre-2.0.0 gallery
+  translations already carried it. Everything else this walkthrough step
+  adds — the rest of `catalogue.field.*` / `catalogue.search.*`, all of
+  `record.glossary.tool` and `record.dynasty.*`, and all fourteen new
+  `exhibition.*` entries, in every one of the eleven languages including
+  `ar`, `es` and `fr` — is English. None of it existed anywhere as a
+  translated string to reuse: the three standalone sites never had a
+  non-English `locales/` file, and `exhibition/`'s non-English files have
+  been English copies since 2.2.0, MWNF never having translated the
+  exhibition write-ups.
+
 ## 2.2.0
 
 Wave 0 of the shared-pages epic (metanull/inventory-app#1692/#1693), walkthrough
