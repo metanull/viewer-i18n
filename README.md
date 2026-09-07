@@ -59,7 +59,7 @@ those exact characters, angle brackets and all. Use Markdown.
 | `gallery/` | the galleries (Carpets, Amulets, …) |
 | `catalogue/` | the list pages every website has: the filters, the search form, the results and their pages |
 | `sheet/` | the labels of a record's sheet — name, date, dimensions, provenance, who prepared it |
-| `record/` | what surrounds the sheet: back, timeline, related items, credits, citation, the glossary |
+| `record/` | what surrounds the sheet: back, timeline, related items, credits, citation, the glossary, the dynasties popout |
 | `exhibition/` | the exhibitions (Water in Islam, The Use of Colours in Art, …) |
 | `timeline/` | the timeline pages: the country and period form, the results, the errors — worded so the same text serves a gallery, an exhibition or a standalone site |
 | `partner/` | the partner pages: the profile fields, the map, the list and its sorting, "not found" — worded the same way |
