@@ -1,3 +1,9 @@
+## 2.4.0
+
+Part of epic metanull/inventory-app#1692, wave I partner adoptions (metanull/inventory-app#1697), story metanull/inventory-app#1703 (metanull/viewer-i18n#26).
+
+- **partner.map.openInOpenStreetMap** ("Open in OpenStreetMap"): the neutral entry for the partner map's link, shared across all website kinds. The two product entries (gallery.action.openInOpenStreetMap, xhibition.action.openInOpenStreetMap) stay until every site reads the shared one (removal last, metanull/viewer-layout#67).
+
 # Changelog
 
 ## 2.3.0
