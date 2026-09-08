@@ -28,5 +28,8 @@
   "record.sheet.credits": "Credits",
   "record.sheet.languages": "Languages",
   "record.sheet.notFound": "Item not found.",
-  "record.sheet.sourceDatabase": "Source database"
+  "record.sheet.sourceDatabase": "Source database",
+  "record.source.label": "Source",
+  "record.source.rightsHolder": "Rights holder",
+  "record.source.termsOfUse": "Terms of use"
 }

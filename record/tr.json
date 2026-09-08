@@ -28,5 +28,8 @@
   "record.sheet.credits": "Katkıda bulunanlar",
   "record.sheet.languages": "Diller",
   "record.sheet.notFound": "Kayıt bulunamadı.",
-  "record.sheet.sourceDatabase": "Kaynak veri tabanı"
+  "record.sheet.sourceDatabase": "Kaynak veri tabanı",
+  "record.source.label": "Kaynak",
+  "record.source.rightsHolder": "Hak Sahibi",
+  "record.source.termsOfUse": "Kullanım Koşulları"
 }

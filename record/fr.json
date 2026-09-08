@@ -28,5 +28,8 @@
   "record.sheet.credits": "Crédits",
   "record.sheet.languages": "Langues",
   "record.sheet.notFound": "Entrée introuvable.",
-  "record.sheet.sourceDatabase": "Base de données d’origine"
+  "record.sheet.sourceDatabase": "Base de données d’origine",
+  "record.source.label": "Source",
+  "record.source.rightsHolder": "Titulaire des droits",
+  "record.source.termsOfUse": "Conditions d'utilisation"
 }

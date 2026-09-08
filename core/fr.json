@@ -11,6 +11,7 @@
   "core.action.search": "Rechercher",
   "core.action.viewDetails": "Voir les détails",
   "core.detail.notFound": "Cette fiche n’existe pas.",
+  "core.footer.legalNotice": "Avertissement juridique",
   "core.list.empty": "Rien à afficher pour le moment.",
   "core.nav.backToList": "Retour à la liste",
   "core.nav.home": "Accueil",

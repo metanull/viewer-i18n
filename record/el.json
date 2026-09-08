@@ -28,5 +28,8 @@
   "record.sheet.credits": "Συντελεστές",
   "record.sheet.languages": "Γλώσσες",
   "record.sheet.notFound": "Η εγγραφή δεν βρέθηκε.",
-  "record.sheet.sourceDatabase": "Βάση δεδομένων προέλευσης"
+  "record.sheet.sourceDatabase": "Βάση δεδομένων προέλευσης",
+  "record.source.label": "Πηγή",
+  "record.source.rightsHolder": "Κάτοχος δικαιωμάτων",
+  "record.source.termsOfUse": "Όροι χρήσης"
 }
