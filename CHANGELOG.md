@@ -1,4 +1,6 @@
-## 3.0.0
+## 3.0.1
+
+Version 3.0.0 was published from commit ee037cf by mistake and carries none of these removals. This release is the first version to contain them.
 
 Part of epic metanull/inventory-app#1692, wave J (metanull/inventory-app#1698), step 90. Follows waves A–I, which introduce shared entries (timeline, partner, etc.) to replace the product-specific duplicates in gallery and exhibition namespaces.
 
