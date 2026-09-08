@@ -1,3 +1,66 @@
+## 3.0.0
+
+Part of epic metanull/inventory-app#1692, wave J (metanull/inventory-app#1698), step 90. Follows waves A–I, which introduce shared entries (timeline, partner, etc.) to replace the product-specific duplicates in gallery and exhibition namespaces.
+
+### Removed
+
+51 superseded product-specific entries (each replaced by a neutral shared entry):
+
+- **gallery.action.openInOpenStreetMap → partner.map.openInOpenStreetMap**
+- **gallery.action.partnerHomepage → partner.nav.homepage**
+- **gallery.action.seeGallery → timeline.action.seeGallery**
+- **gallery.nav.dynastiesHeading → record.dynasty.heading**
+- **gallery.nav.galleries → core.project.galleries**
+- **gallery.partner.about → partner.info.about**
+- **gallery.partner.addresses → partner.info.addresses**
+- **gallery.partner.contact → partner.info.contact**
+- **gallery.partner.logo → partner.info.logo**
+- **gallery.partner.map → partner.map.map**
+- **gallery.partner.mapOf → partner.map.mapOf**
+- **gallery.partner.onTheMap → partner.map.onTheMap**
+- **gallery.partner.sortAscending → partner.list.sortAscending**
+- **gallery.partner.sortDescending → partner.list.sortDescending**
+- **gallery.results.countryDescription → timeline.results.countryDescription**
+- **gallery.search.howTo → catalogue.search.howToEssay**
+- **gallery.timeline.allCountries → timeline.form.allCountries**
+- **gallery.timeline.backToEvents → timeline.action.backToEvents**
+- **gallery.timeline.beginFullSearch → timeline.results.beginFullSearch**
+- **gallery.timeline.earliest → timeline.form.earliest**
+- **gallery.timeline.galleryHeading → timeline.nav.galleryHeading**
+- **gallery.timeline.latest → timeline.form.latest**
+- **gallery.timeline.noEvents → timeline.results.noEvents**
+- **gallery.timeline.noResults → timeline.results.noResults**
+- **gallery.timeline.searchIntro → timeline.results.searchIntro**
+- **gallery.timeline.selectCountry → timeline.form.selectCountry**
+- **gallery.timeline.to → timeline.form.to**
+- **exhibition.action.seeGallery → timeline.action.seeGallery**
+- **exhibition.nav.dynastiesHeading → record.dynasty.heading**
+- **exhibition.nav.galleries → core.project.galleries**
+- **exhibition.partner.about → partner.info.about**
+- **exhibition.partner.addresses → partner.info.addresses**
+- **exhibition.partner.contact → partner.info.contact**
+- **exhibition.partner.logo → partner.info.logo**
+- **exhibition.partner.map → partner.map.map**
+- **exhibition.partner.mapOf → partner.map.mapOf**
+- **exhibition.partner.onTheMap → partner.map.onTheMap**
+- **exhibition.partner.sortAscending → partner.list.sortAscending**
+- **exhibition.partner.sortDescending → partner.list.sortDescending**
+- **exhibition.results.countryDescription → timeline.results.countryDescription**
+- **exhibition.search.howTo → catalogue.search.howToEssay**
+- **exhibition.timeline.allCountries → timeline.form.allCountries**
+- **exhibition.timeline.backToEvents → timeline.action.backToEvents**
+- **exhibition.timeline.beginFullSearch → timeline.results.beginFullSearch**
+- **exhibition.timeline.earliest → timeline.form.earliest**
+- **exhibition.timeline.galleryHeading → timeline.nav.galleryHeading**
+- **exhibition.timeline.latest → timeline.form.latest**
+- **exhibition.timeline.noEvents → timeline.results.noEvents**
+- **exhibition.timeline.noResults → timeline.results.noResults**
+- **exhibition.timeline.searchIntro → timeline.results.searchIntro**
+- **exhibition.timeline.selectCountry → timeline.form.selectCountry**
+- **exhibition.timeline.to → timeline.form.to**
+
+All sites have been updated to read the shared entries in timeline, partner, catalogue, record, and core namespaces. These product-specific duplicates are no longer read by any site as of this release. The seven sites pin this major version in wave K (metanull/inventory-app#1702).
+
 ## 2.5.0
 
 Part of epic metanull/inventory-app#1692, wave K (metanull/inventory-app#1702), walkthrough step 94 (metanull/viewer-i18n#25).
@@ -328,3 +391,4 @@ any website offers.
   ~170 the two share and the ones the new namespaces now say again. Nothing
   reads the new ones yet; the websites move over one by one, and the
   duplicates go in a later major once nothing reads them.
+
