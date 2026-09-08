@@ -1,3 +1,10 @@
+## 2.5.0
+
+Part of epic metanull/inventory-app#1692, wave K (metanull/inventory-app#1702), walkthrough step 94 (metanull/viewer-i18n#25).
+
+- **record.source.label** ("Source"), **record.source.termsOfUse** ("Terms of use"), **record.source.rightsHolder** ("Rights holder"): neutral entries for the source credit on a record's page, shared across all website kinds. Additive.
+- **core.footer.legalNotice** ("Important Legal Notice"): the shared legal-notice label for websites without product-specific footers (the standalone sites). Copied from `gallery.footer.legalNotice` and `exhibition.footer.legalNotice` for each language; the two product entries stay until wave J's removal story (metanull/viewer-i18n#21). Additive.
+
 ## 2.4.0
 
 Part of epic metanull/inventory-app#1692, wave I partner adoptions (metanull/inventory-app#1697), story metanull/inventory-app#1703 (metanull/viewer-i18n#26).

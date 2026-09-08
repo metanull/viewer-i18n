@@ -28,5 +28,8 @@
   "record.sheet.credits": "شكر وعرفان",
   "record.sheet.languages": "اللغات",
   "record.sheet.notFound": "لم يُعثر على السجل.",
-  "record.sheet.sourceDatabase": "قاعدة البيانات المصدر"
+  "record.sheet.sourceDatabase": "قاعدة البيانات المصدر",
+  "record.source.label": "المصدر",
+  "record.source.rightsHolder": "صاحب الحقوق",
+  "record.source.termsOfUse": "شروط الاستخدام"
 }

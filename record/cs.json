@@ -28,5 +28,8 @@
   "record.sheet.credits": "Autoři a poděkování",
   "record.sheet.languages": "Jazyky",
   "record.sheet.notFound": "Záznam nebyl nalezen.",
-  "record.sheet.sourceDatabase": "Zdrojová databáze"
+  "record.sheet.sourceDatabase": "Zdrojová databáze",
+  "record.source.label": "Zdroj",
+  "record.source.rightsHolder": "Držitel práv",
+  "record.source.termsOfUse": "Podmínky používání"
 }

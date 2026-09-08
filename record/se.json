@@ -28,5 +28,8 @@
   "record.sheet.credits": "Medverkande",
   "record.sheet.languages": "Språk",
   "record.sheet.notFound": "Posten hittades inte.",
-  "record.sheet.sourceDatabase": "Källdatabas"
+  "record.sheet.sourceDatabase": "Källdatabas",
+  "record.source.label": "Källa",
+  "record.source.rightsHolder": "Rättighetshavare",
+  "record.source.termsOfUse": "Användarvillkor"
 }

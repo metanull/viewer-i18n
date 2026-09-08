@@ -11,6 +11,7 @@
   "core.action.search": "Hledat",
   "core.action.viewDetails": "Zobrazit podrobnosti",
   "core.detail.notFound": "Tento záznam neexistuje.",
+  "core.footer.legalNotice": "Important Legal Notice",
   "core.list.empty": "Zatím není co zobrazit.",
   "core.nav.backToList": "Zpět na seznam",
   "core.nav.home": "Domů",

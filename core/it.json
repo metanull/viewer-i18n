@@ -11,6 +11,7 @@
   "core.action.search": "Cerca",
   "core.action.viewDetails": "Vedi i dettagli",
   "core.detail.notFound": "Questa scheda non esiste.",
+  "core.footer.legalNotice": "Important Legal Notice",
   "core.list.empty": "Ancora niente da mostrare.",
   "core.nav.backToList": "Torna all’elenco",
   "core.nav.home": "Home",

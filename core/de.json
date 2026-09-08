@@ -11,6 +11,7 @@
   "core.action.search": "Suchen",
   "core.action.viewDetails": "Details anzeigen",
   "core.detail.notFound": "Dieser Datensatz existiert nicht.",
+  "core.footer.legalNotice": "Important Legal Notice",
   "core.list.empty": "Noch nichts anzuzeigen.",
   "core.nav.backToList": "Zurück zur Liste",
   "core.nav.home": "Startseite",

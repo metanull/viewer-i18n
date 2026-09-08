@@ -11,6 +11,7 @@
   "core.action.search": "Search",
   "core.action.viewDetails": "View details",
   "core.detail.notFound": "This record does not exist.",
+  "core.footer.legalNotice": "Important Legal Notice",
   "core.list.empty": "Nothing to display yet.",
   "core.nav.backToList": "Back to the list",
   "core.nav.home": "Home",

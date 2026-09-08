@@ -28,5 +28,8 @@
   "record.sheet.credits": "Nachweise",
   "record.sheet.languages": "Sprachen",
   "record.sheet.notFound": "Eintrag nicht gefunden.",
-  "record.sheet.sourceDatabase": "Quelldatenbank"
+  "record.sheet.sourceDatabase": "Quelldatenbank",
+  "record.source.label": "Quelle",
+  "record.source.rightsHolder": "Rechteinhaber",
+  "record.source.termsOfUse": "Nutzungsbedingungen"
 }

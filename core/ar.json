@@ -11,6 +11,7 @@
   "core.action.search": "ابحث",
   "core.action.viewDetails": "عرض التفاصيل",
   "core.detail.notFound": "هذا السجل غير موجود.",
+  "core.footer.legalNotice": "ملاحظة قانونية مهمة",
   "core.list.empty": "لا يوجد ما يُعرض بعد.",
   "core.nav.backToList": "العودة إلى القائمة",
   "core.nav.home": "الرئيسية",
