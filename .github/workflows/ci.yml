@@ -11,10 +11,10 @@ permissions:
 
 jobs:
   ci:
-    uses: museumwithnofrontiers/viewer-workflows/.github/workflows/package-ci.yml@v1.9.0
+    uses: museumwithnofrontiers/viewer-workflows/.github/workflows/package-ci.yml@v1.10.0
 
   texts:
-    uses: museumwithnofrontiers/viewer-workflows/.github/workflows/locale-validate.yml@v1.9.0
+    uses: museumwithnofrontiers/viewer-workflows/.github/workflows/locale-validate.yml@v1.10.0
     with:
       mode: dictionary
       texts_path: "core/ layout/ catalogue/ sheet/ record/ gallery/ exhibition/"
