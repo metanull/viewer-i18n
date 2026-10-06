@@ -9,4 +9,4 @@ permissions:
 
 jobs:
   automerge:
-    uses: museumwithnofrontiers/viewer-workflows/.github/workflows/dependabot-automerge.yml@v1.9.0
+    uses: museumwithnofrontiers/viewer-workflows/.github/workflows/dependabot-automerge.yml@v1.10.0
